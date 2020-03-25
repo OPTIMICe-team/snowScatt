@@ -1,2 +1,2 @@
-from .compute import backscattering, snow
+from .compute import snow
 from . import refractiveIndex
