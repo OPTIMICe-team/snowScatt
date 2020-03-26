@@ -31,17 +31,17 @@ from Cython.Build import cythonize
 def configuration(parent_package='',top_path=None):
     from numpy.distutils.misc_util import Configuration
     config = Configuration('snowScatt', parent_package, top_path,
-        version = '0.0.0',
+        version = '0.1.0-alpha',
         author  = "Davide Ori",
         author_email = "davide.ori87@gmail.com",
         description = "SSRGA scattering computation and snow properties",
         license = "MIT",
-        url = 'https://github.com/...',
+        url = 'https://github.com/DaveOri/snowScatt.git',
         download_url = \
-            'https://github.com/...',
+            'https://github.com/DaveOri/snowScatt.git',
         long_description = long_description,
         classifiers = [
-            "Development Status :: 0 - alpha",
+            "Development Status :: 3 - alpha",
             "Intended Audience :: Science/Research",
             "License :: OSI Approved :: MIT License",
             "Operating System :: OS Independent",
@@ -80,5 +80,5 @@ if __name__ == "__main__":
             'snowScatt.refractiveIndex': ['*.dat'],
         },
         platforms = ['any'],
-        requires = ['numpy', 'scipy', 'Cython'],
+        requires = ['numpy', 'scipy', 'Cython', 'pandas', 'os'],
         ext_modules=cythonize([ssrgalib]))
