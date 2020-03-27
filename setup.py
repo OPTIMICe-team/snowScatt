@@ -74,11 +74,12 @@ if __name__ == "__main__":
     setup(configuration=configuration,
         packages = ['snowScatt',
                     'snowScatt.snowProperties',
-                    'snowScatt.refractiveIndex',],        
-        package_data = {
-            'snowScatt.snowProperties': ['*.dat'],
-            'snowScatt.refractiveIndex': ['*.dat'],
-        },
+                    'snowScatt.refractiveIndex',],
+        package_dir={'snowScatt': 'python' ,
+                     'snowScatt.snowProperties': 'python/snowProperties',
+                     'snowScatt.refractiveIndex': 'python/refractiveIndex',},
+        package_data = {'snowScatt.snowProperties': ['*.dat'],
+                        'snowScatt.refractiveIndex': ['*.dat'],},
         platforms = ['any'],
         requires = ['numpy', 'scipy', 'Cython', 'pandas', 'os'],
         ext_modules=cythonize([ssrgalib]))
