@@ -1,2 +1,3 @@
-from .compute import snow
+from ._compute import snow
 from . import refractiveIndex
+from .snowProperties import snowLibrary
