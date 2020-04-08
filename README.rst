@@ -2,9 +2,9 @@
 snowScatt
 =======
 
-.. image:: https://readthedocs.org/projects/snowScatt/badge/?version=latest
-    :target: https://snowScatt.readthedocs.io/en/latest/?badge=latest
-    :alt: Documentation Status
+.. image:: https://readthedocs.org/projects/snowscatt/badge/?version=latest
+:target: https://snowscatt.readthedocs.io/en/latest/?badge=latest
+:alt: Documentation Status
 
 
 `SnowScatt <https://github.com/DaveOri/SnowScatt>`_ is an Open Source Python package to compute scattering and microphysical properties of snowflakes ensambles. Use Self-Similar Rayleigh-Gans Approximation and snowflake aggregation models
