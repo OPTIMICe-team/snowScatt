@@ -41,6 +41,7 @@ static inline double sum_term(double x, double beta, double gamma, double zeta1)
     double sum = zeta1*pow(2.0, -gamma)*(term1*term1 + term2*term2);
 
     int jmax = floor(5.0*x/M_PI + 1.0);
+    //printf("max j %i \n",jmax);
     for (int j = 2; j <= jmax; j++) {
         term1 = 0.5/(x + j*M_PI);
         term2 = 0.5/(x - j*M_PI);
@@ -83,10 +84,10 @@ void ssrga_single(double Deff, double Vol, double wl, double complex K,
 
     for (i_theta=Ntheta-1; i_theta>=0; i_theta--) {
         double theta = i_theta*dTheta;
-        double x_eff = x*sin(0.5*theta);
+        double cos_th = cos(theta);
+        double x_eff = x*sin(0.5*theta);//(1.0-cos_th)*0.5;//
         phase[i_theta] = mean_term(x_eff, kappa) + 
                          sum_term(x_eff, beta, gamma, zeta1);
-        double cos_th = cos(theta);
         phase[i_theta] *= (1.0+cos_th*cos_th)*0.5;
 
         double differential = phase[i_theta]*sin(theta)*dTheta;

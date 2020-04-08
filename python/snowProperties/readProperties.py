@@ -28,16 +28,19 @@ from scipy import interp
 module_path = path.split(path.abspath(__file__))[0]
 
 
-def interpolate_coeff(D, table):
+def _interpolate_coeff(D, table, am, bm, av, bv):
     beta = interp(D, table.index.values, table.beta_z)
     gamma = interp(D, table.index.values, table.gamma_z) # TODO fix the name of the columns
     kappa = interp(D, table.index.values, table.kappa_z)
     zeta1 = interp(D, table.index.values, table.zeta1_z)
     alpha_eff = interp(D, table.index.values, table.alpha_eff)
     ar_mono = interp(D, table.index.values, table.ar_mono)
-    mass = interp(D, table.index.values, table.m)
-    vel = interp(D, table.index.values, table.vel)
-    return beta, -gamma, kappa, zeta1, alpha_eff, ar_mono, mass, vel # TODO fix sign of gamma
+    mass = interp(D, table.index.values, table.m, left=np.nan, right=np.nan)
+    vel = interp(D, table.index.values, table.vel, left=np.nan, right=np.nan)
+    mask = np.isnan(mass)
+    mass[mask] = (am*D**bm)[mask]
+    vel[mask] = (av*D**bv)[mask]
+    return beta, gamma, kappa, zeta1, alpha_eff, ar_mono, mass, vel
 
 ## Library of average parameters
 snowLib = {}
@@ -109,9 +112,9 @@ class snowProperties():
 		print('Initialize a library of snow properties')
 
 	def __call__(self, diameters, identifier):
-		print('return the snow properties for selected sizes')
+		#print('return the snow properties for selected sizes')
 		if identifier in self._library.keys():
-			print('got AVG ', identifier, self._library[identifier])
+			#print('got AVG ', identifier, self._library[identifier])
 			kappa = np.ones_like(diameters)*self._library[identifier]['kappa']
 			beta = np.ones_like(diameters)*self._library[identifier]['beta']
 			gamma = np.ones_like(diameters)*self._library[identifier]['gamma']
@@ -122,12 +125,18 @@ class snowProperties():
 			vel = self._library[identifier]['av']*diameters**self._library[identifier]['bv']
 
 		elif identifier in self._fileList.keys():
-			print('got TABLE ', identifier, self._fileList[identifier])
-			table = pd.read_csv(self._fileList[identifier]['path']).set_index('D')
-			beta, gamma, kappa, zeta1, alpha_eff, ar_mono, mass, vel = interpolate_coeff(diameters, table)
+			#print('got TABLE ', identifier, self._fileList[identifier])
+			with open(self._fileList[identifier]['path']) as f:
+				line = f.read().split('#')[-1].split('\n')[0]
+				am = float(line.split('am=')[-1].split(',')[0])
+				bm = float(line.split('bm=')[-1].split(',')[0])
+				av = float(line.split('av=')[-1].split(',')[0])
+				bv = float(line.split('bv=')[-1].split(',')[0])
+			table = pd.read_csv(self._fileList[identifier]['path'], comment='#').set_index('D')
+			beta, gamma, kappa, zeta1, alpha_eff, ar_mono, mass, vel = _interpolate_coeff(diameters, table, am, bm, av, bv)
 		else:
 			raise AttributeError('I do not know ', identifier, 'call info() for a list of available properties\n')
-		return kappa, beta, gamma, zeta1, alpha_eff, ar_mono, mass, vel
+		return np.asarray(kappa), np.asarray(beta), np.asarray(gamma), np.asarray(zeta1), np.asarray(alpha_eff), np.asarray(ar_mono), np.asarray(mass), np.asarray(vel)
 
 	def add_snow(self, label, newSnowDict):
 		if all (key in newSnowDict for key in (libKeys)):
