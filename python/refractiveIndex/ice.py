@@ -119,7 +119,7 @@ def iwabuchi_yang_2011(temperature, frequency):
     if (frequency < 0).any():
         raise ValueError('A negative frequency value has been passed')
 
-    if (temperature.size == frequency.size) and (frequency.size<1):
+    if (temperature.size == frequency.size):
         eps_real = iwabuchi_ice_interp_real(temperature.flatten(
         ), frequency.flatten()).diagonal().reshape(frequency.shape)
         eps_imag = iwabuchi_ice_interp_imag(temperature.flatten(

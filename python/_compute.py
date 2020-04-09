@@ -150,6 +150,7 @@ def snow(diameters, wavelength, properties, ref_index=None, temperature=None, ma
             raise AttributeError('You have to either specify directly the refractive index or provide the temperature so that refractive index will be calculated according to Iwabuchi 2011 model\n')
         print('computing refractive index of ice ...')
         temperature = temperature*np.ones_like(diameters)
+        #print(temperature.shape, (_c/wavelength).shape)
         ref_index = ice.n(temperature, _c/wavelength, model='Iwabuchi_2011')
     else:
         ref_index = ref_index*np.ones_like(diameters)
