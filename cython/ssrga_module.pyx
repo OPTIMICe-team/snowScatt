@@ -51,8 +51,7 @@ def ssrgaBack(np.ndarray[dtype = double_t, ndim = 1, mode = "c"] Deff,
 	          np.ndarray[dtype = double_t, ndim = 1, mode = "c"] kappa,
 	          np.ndarray[dtype = double_t, ndim = 1, mode = "c"] gamma,
 	          np.ndarray[dtype = double_t, ndim = 1, mode = "c"] beta,
-	          np.ndarray[dtype = double_t, ndim = 1, mode = "c"] zeta0,
-	          int_t Ntheta):
+	          np.ndarray[dtype = double_t, ndim = 1, mode = "c"] zeta0):
 
 	cdef int_t Npart = len(Deff)
 	cdef np.ndarray[dtype = double_t, ndim = 1, mode = "c"] Cbck
