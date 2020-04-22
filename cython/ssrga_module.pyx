@@ -44,6 +44,27 @@ def ssrga(np.ndarray[dtype = double_t, ndim = 1, mode = "c"] Deff,
 	return Cext, Cabs, Csca, Cbck, asym, phase.reshape(Npart, Ntheta)
 
 
+def ssrgaBack(np.ndarray[dtype = double_t, ndim = 1, mode = "c"] Deff,
+	      	  np.ndarray[dtype = double_t, ndim = 1, mode = "c"] Vol,
+	          np.ndarray[dtype = double_t, ndim = 1, mode = "c"] wl,
+	          np.ndarray[dtype = complex_t, ndim = 1, mode = "c"] K,
+	          np.ndarray[dtype = double_t, ndim = 1, mode = "c"] kappa,
+	          np.ndarray[dtype = double_t, ndim = 1, mode = "c"] gamma,
+	          np.ndarray[dtype = double_t, ndim = 1, mode = "c"] beta,
+	          np.ndarray[dtype = double_t, ndim = 1, mode = "c"] zeta0,
+	          int_t Ntheta):
+
+	cdef int_t Npart = len(Deff)
+	cdef np.ndarray[dtype = double_t, ndim = 1, mode = "c"] Cbck
+	Cbck = np.empty_like(Deff, dtype=np.float64)
+	ssrgaLib.ssrgaBack(Npart, < double * > Deff.data, < double * > Vol.data,
+                       < double * > wl.data, < double complex * > K.data, 
+		               < double * > kappa.data, < double * > gamma.data,
+		               < double * > beta.data, < double * > zeta0.data,
+                       < double * > Cbck.data)
+	return Cbck
+
+
 def hexPrismK(np.ndarray[dtype = complex_t, ndim = 1, mode = 'c'] refind,
 	          np.ndarray[dtype = double_t, ndim = 1, mode = 'c'] aspect):
 	cdef np.ndarray[dtype = complex_t, ndim = 1, mode = 'c'] K

@@ -41,6 +41,18 @@ cdef extern from "../src/ssrga.h":
                       double kappa, double gamma, double beta, double zeta0, int Ntheta,
                       double *Cext, double *Cabs, double *Csca, double *Cbck, double *asym, double *phase);
 
+cdef extern from "../src/ssrga.h":
+    void ssrgaBack(int Nparticles,
+                     double *Deff, double *Vol, double *wl, double complex *K,
+                     double *kappa, double *gamma, double *beta, double *zeta1,
+                     double *Cbck);
+
+# Once I have the vectorized function this will not be necessary anymore
+cdef extern from "../src/ssrga.h":
+    void back_single(double Deff, double Vol, double wl, double complex K,
+                     double kappa, double gamma, double beta, double zeta0,
+                     double *Cbck);
+
 # Here potentially for debugging purposes
 cdef extern from "../src/dielectric_factor.h":
     void dielectric_factor_hexagonal(double complex refind, double aspect, double complex *K);

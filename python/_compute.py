@@ -22,12 +22,14 @@ University of Cologne
 import numpy as np
 
 from snowScatt.ssrgalib import ssrga
+from snowScatt.ssrgalib import ssrgaBack
 from snowScatt.ssrgalib import hexPrismK
 from snowScatt.snowProperties import snowLibrary
 from snowScatt.refractiveIndex import ice
 
 _c = 2.99792458e8
 _ice_density = 917.0
+
 
 def _compute_effective_size(size=None, ar=None, angle=None):
     """
@@ -50,17 +52,49 @@ def _compute_effective_size(size=None, ar=None, angle=None):
         by angle
     """
 
-    #size_eff = (0.5*size*ar)**2/(ar**2*np.cos(angle)**2+np.sin(angle)**2)
-
-    #return 2.*np.sqrt(size_eff)
-    return size/np.sqrt(np.cos(angle)**2+(np.sin(angle)/ar)**2)
+    return size/np.sqrt(np.sin(angle)**2+(np.cos(angle)/ar)**2)
 
 
 def _convert_to_array(x):
     return np.asarray([x]) if np.isscalar(x) else np.asarray(x)
 
 
-def snow(diameters, wavelength, properties, ref_index=None, temperature=None, mass=None, theta=0.0, Nangles=181):
+def _prepare_input(diameters, wavelength, properties, ref_index, temperature, 
+                   mass, theta):
+    diameters = _convert_to_array(diameters)
+    wavelength = wavelength*np.ones_like(diameters)
+
+    if ref_index is None:
+        if temperature is None:
+            raise AttributeError('You have to either specify directly the refractive index or provide the temperature so that refractive index will be calculated according to Iwabuchi 2011 model\n')
+        print('computing refractive index of ice ...')
+        temperature = temperature*np.ones_like(diameters)
+        #print(temperature.shape, (_c/wavelength).shape)
+        ref_index = ice.n(temperature, _c/wavelength,
+                          matzlerCheckTemperature=True)
+    else:
+        ref_index = ref_index*np.ones_like(diameters)
+        #print(type(ref_index), ref_index.shape, ref_index)
+
+    kappa, beta, gamma, zeta1, alpha_eff, ar_mono, mass_prop, vel = snowLibrary(diameters, properties)
+    
+    if mass is None:
+        print('compute masses from snow properties')
+        mass = mass_prop
+    else:
+        mass = mass*np.ones_like(diameters)
+    
+    Vol = mass/_ice_density
+    
+    K = hexPrismK(ref_index, ar_mono)
+
+    Deff = _compute_effective_size(diameters, alpha_eff, theta)
+
+    return Deff, Vol, wavelength, K, kappa, gamma, beta, zeta1, mass_prop, vel
+
+
+def calcProperties(diameters, wavelength, properties, ref_index=None,
+                   temperature=None, mass=None, theta=0.0, Nangles=181):
     """
     This is the main function of the snowScatt module. It is a python interface 
     to the snowLibrary and the low level C functions that compute the SSRGA
@@ -142,34 +176,43 @@ def snow(diameters, wavelength, properties, ref_index=None, temperature=None, ma
     AttributeError : if neither ref_index nor temperature are defined
     """
 
-    diameters = _convert_to_array(diameters)
-    wavelength = wavelength*np.ones_like(diameters)
-
-    if ref_index is None:
-        if temperature is None:
-            raise AttributeError('You have to either specify directly the refractive index or provide the temperature so that refractive index will be calculated according to Iwabuchi 2011 model\n')
-        print('computing refractive index of ice ...')
-        temperature = temperature*np.ones_like(diameters)
-        #print(temperature.shape, (_c/wavelength).shape)
-        ref_index = ice.n(temperature, _c/wavelength, model='Iwabuchi_2011')
-    else:
-        ref_index = ref_index*np.ones_like(diameters)
-        #print(type(ref_index), ref_index.shape, ref_index)
-
-    kappa, beta, gamma, zeta1, alpha_eff, ar_mono, mass_prop, vel = snowLibrary(diameters, properties)
-    
-    if mass is None:
-        print('compute masses from snow properties')
-        mass = mass_prop
-    else:
-        mass = mass*np.ones_like(diameters)
-    
-    Vol = mass/_ice_density
-    
-    K = hexPrismK(ref_index, ar_mono)
-
-    Deff = _compute_effective_size(diameters, alpha_eff, theta) # TODO substitute with a C function that takes into account prolate particles
-
-    Cext, Cabs, Csca, Cbck, asym, phase = ssrga(Deff, Vol, wavelength, K, kappa, gamma, beta, zeta1, Nangles)
+    params = _prepare_input(diameters, wavelength, properties,
+                            ref_index, temperature, mass, theta)
+    Deff, Vol, wavelength, K, kappa, gamma, beta, zeta1, mass_prop, vel = params
+    Cext, Cabs, Csca, Cbck, asym, phase = ssrga(Deff, Vol, wavelength, K,
+                                                kappa, gamma, beta, zeta1,
+                                                Nangles)
 
     return Cext, Cabs, Csca, Cbck, asym, phase, mass_prop, vel
+
+
+def backscatter(diameters, wavelength, properties, ref_index=None,
+                temperature=None, mass=None, theta=0.0):
+    """
+    Python interface to the fast computation of radar backscattering cross section using SSRGA.
+    Unlike the ordinary SSRGA, this function only solve the RGA problem for the
+    backscattering direction, avoiding the calculation of the full phase
+    function and the integration over the solid angle needed to compute the
+    total scattering cross section. It is expected to provide an improvement in
+    computational performances in the order of Nangle.
+    """
+    params = _prepare_input(diameters, wavelength, properties,
+                            ref_index, temperature, mass, theta)
+    Deff, Vol, wavelength, K, kappa, gamma, beta, zeta1, mass_prop, vel = params
+    
+    return ssrgaBack(Deff, Vol, wavelength, K, kappa, gamma, beta, zeta1)
+
+
+def backscatVel(diameters, wavelength, properties, ref_index=None,
+                temperature=None, mass=None, theta=0.0):
+    """
+    Convenience function for the implementation of a simple Radar Doppler
+    simulator. It computes backscattering fast as the backscatter function, but
+    it also returns the array of velocities since they are already extracted
+    from the library
+    """
+    params = _prepare_input(diameters, wavelength, properties,
+                            ref_index, temperature, mass, theta)
+    Deff, Vol, wavelength, K, kappa, gamma, beta, zeta1, mass_prop, vel = params
+    
+    return ssrgaBack(Deff, Vol, wavelength, K, kappa, gamma, beta, zeta1), vel

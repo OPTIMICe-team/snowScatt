@@ -35,7 +35,8 @@ static inline double mean_term(double x, double kappa) {
     return term*term;
 }
 
-static inline double sum_term(double x, double beta, double gamma, double zeta1) {
+static inline double sum_term(double x,
+                              double beta, double gamma, double zeta1) {
     double term1 = 0.5 / (x + M_PI);
     double term2 = 0.5 / (x - M_PI);
     double sum = zeta1*pow(2.0, -gamma)*(term1*term1 + term2*term2);
@@ -104,4 +105,26 @@ void ssrga_single(double Deff, double Vol, double wl, double complex K,
     for (i_theta = 0; i_theta < Ntheta; i_theta++) {
         phase[i_theta] *= phase_norm;
     }
+}
+
+// SSRGA compute only backscattering for a vector of particles
+void ssrgaBack(int Nparticles, double *Deff, double *Vol,
+               double *wl, double complex *K,
+               double *kappa, double *gamma, double *beta, double *zeta1,
+               double *Cbck) {
+    for (int i=0; i<Nparticles; i++) {
+        back_single(Deff[i], Vol[i], wl[i], K[i],
+                    kappa[i], gamma[i], beta[i], zeta1[i],
+                    Cbck+i); // C pointer arithmetic
+    }
+}
+
+// SSRGA backscattering for a single particle 
+void back_single(double Deff, double Vol, double wl, double complex K,
+                 double kappa, double gamma, double beta, double zeta1,
+                 double *Cbck) {
+    double wavenumber = 2.0*M_PI/wl;
+    double prefact = prefactor(wavenumber, K, Vol);
+    double x = wavenumber*Deff;
+    *Cbck = prefact*(mean_term(x, kappa) + sum_term(x, beta, gamma, zeta1));
 }

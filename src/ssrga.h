@@ -11,11 +11,19 @@ void ssrga(int Nparticles,
 	       int Ntheta, double *Cext, double *Cabs, double *Csca,
 	       double *Cbck, double *asym, double *phase);
 
+void ssrgaBack(int Nparticles, double *Deff, double *Vol,
+	             double *wl, double complex *K,
+	             double *kappa, double *gamma, double *beta, double *zeta1,
+	             double *Cbck);
+
 void ssrga_single(double Deff, double Vol, double wl, double complex K,
 	              double kappa, double gamma, double beta, double zeta1,
 	              int Ntheta, double *Cext, double *Cabs, double *Csca,
 	              double *Cbck, double *asym, double *phase);
 
+void back_single(double Deff, double Vol, double wl, double complex K,
+	             double kappa, double gamma, double beta, double zeta1,
+	             double *Cbck);
 // Ve do not need to declare inline functions
 //inline double prefactor(double wavenumber, double complex K, double Vol);
 //inline double mean_term(double x, double kappa);
