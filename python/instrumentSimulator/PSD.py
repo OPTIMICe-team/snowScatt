@@ -70,13 +70,13 @@ class ExponentialPSD(PSD):
             psd[D > self.D_max] = 0.0
         return psd
 
-    def __eq__(self, other):
-        try:
-            return isinstance(other, ExponentialPSD) and \
-                (self.N0 == other.N0) and (self.Lambda == other.Lambda) and \
-                (self.D_max == other.D_max)
-        except AttributeError:
-            return False
+    # def __eq__(self, other):
+    #     try:
+    #         return isinstance(other, ExponentialPSD) and \
+    #             (self.N0 == other.N0) and (self.Lambda == other.Lambda) and \
+    #             (self.D_max == other.D_max)
+    #     except AttributeError:
+    #         return False
 
 
 class UnnormalizedGammaPSD(ExponentialPSD):
@@ -171,13 +171,13 @@ class GammaPSD(PSD):
             psd[(D > self.D_max) | (D==0.0)] = 0.0
         return psd
 
-    def __eq__(self, other):
-        try:
-            return isinstance(other, GammaPSD) and (self.D0 == other.D0) and \
-                (self.Nw == other.Nw) and (self.mu == other.mu) and \
-                (self.D_max == other.D_max)
-        except AttributeError:
-            return False
+    # def __eq__(self, other):
+    #     try:
+    #         return isinstance(other, GammaPSD) and (self.D0 == other.D0) and \
+    #             (self.Nw == other.Nw) and (self.mu == other.mu) and \
+    #             (self.D_max == other.D_max)
+    #     except AttributeError:
+    #         return False
 
 
 class BinnedPSD(PSD):
@@ -227,9 +227,9 @@ class BinnedPSD(PSD):
         else:
             return np.array([self.psd_for_D(d) for d in D])
     
-    def __eq__(self, other):
-        if other is None:
-            return False
-        return len(self.bin_edges) == len(other.bin_edges) and \
-            (self.bin_edges == other.bin_edges).all() and \
-            (self.bin_psd == other.bin_psd).all()
+    # def __eq__(self, other):
+    #     if other is None:
+    #         return False
+    #     return len(self.bin_edges) == len(other.bin_edges) and \
+    #         (self.bin_edges == other.bin_edges).all() and \
+    #         (self.bin_psd == other.bin_psd).all()
