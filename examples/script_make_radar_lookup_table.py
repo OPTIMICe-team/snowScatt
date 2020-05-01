@@ -7,11 +7,21 @@ import snowScatt
 
 ## Input parameters
 
-sizes = np.linspace(0.1e-3, 1.0e-1, 1000) # list of sizes
+Dmax = np.linspace(0.1e-3, 1.0e-1, 1000) # list of sizes
+sizes = xr.IndexVariable(dims='size', data=Dmax,
+                         attrs={'long_name':'Size - Maximum dimension',
+                                'units':'meters'})
 particle = 'Leinonen15tab00'
-frequency = np.array([5.6e9, 9.6e9, 13.6e9, 35.6e9, 94.0e9]) # list of frequencies
-temperature = [270.0] # list of temperatures
-Nangles = 721 # number of angles of the phase function subdivision
+frequency =  np.array([5.6e9, 9.6e9, 13.6e9, 35.6e9, 94.0e9]) # frequencies
+frequency = xr.IndexVariable(dims='frequency', data=frequency,
+                             attrs={'units':'Hertz'})
+temperature = xr.IndexVariable(dims='temperature', data=[270.0], # temperatures
+                               attrs={'units':'Kelvin'})
+Nangles = 721  # number of angles of the phase function subdivision
+angles = xr.IndexVariable(dims='scat_angle',
+                          data=np.linspace(0, np.pi, Nangles),
+                          attrs={'long_name':'scattering angle',
+                                 'units':'radians'})
 filename = 'leinonen_unrimed_LUT.nc' # output filename
 
 ## Create empty xarray variables
@@ -19,31 +29,29 @@ dims = ['size', 'frequency', 'temperature']
 coords = {'size': sizes,
           'frequency': frequency,
           'temperature': temperature}
-empty = np.empty([len(sizes), len(frequency), len(temperature)])
-Cext = xr.DataArray(empty, dims=dims, coords=coords,
+
+Cext = xr.DataArray(dims=dims, coords=coords,
                     attrs={'long_name':'Extinction cross-section',
                            'units':'meters**2'})
-Cabs = xr.DataArray(empty, dims=dims, coords=coords,
+Cabs = xr.DataArray(dims=dims, coords=coords,
                     attrs={'long_name':'Absorption cross-section',
                            'units':'meters**2'})
-Csca = xr.DataArray(empty, dims=dims, coords=coords,
+Csca = xr.DataArray(dims=dims, coords=coords,
                     attrs={'long_name':'Scattering cross-section',
                            'units':'meters**2'})
-Cbck = xr.DataArray(empty, dims=dims, coords=coords,
+Cbck = xr.DataArray(dims=dims, coords=coords,
                     attrs={'long_name':'Radar backscattering cross section',
                            'units':'meters**2'})
-asym = xr.DataArray(empty, dims=dims, coords=coords,
+asym = xr.DataArray(dims=dims, coords=coords,
                     attrs={'long_name':'Asymmetry parameter',
                            'units':'dimensionless'})
 dims = ['size', 'scat_angle', 'frequency', 'temperature']
 angles = np.linspace(0.0, np.pi, Nangles)
 coords['scat_angle'] = angles
-phase = xr.DataArray(np.empty([len(sizes), Nangles,
-                               len(frequency), len(temperature)]),
-                     dims=dims, coords=coords,
+phase = xr.DataArray(dims=dims, coords=coords,
                      attrs={'long_name':'Phase function',
                             'units':'dimensionless???'})
-mass = xr.DataArray(np.empty_like(sizes), dims=['size'],
+mass = xr.DataArray(dims=['size'],
                     coords={'size':sizes},
                     attrs={'long_name':'mass',
                            'units':'kilograms'})
@@ -53,27 +61,27 @@ vel = xr.DataArray(np.empty_like(sizes), dims=['size'], coords={'size':sizes},
 
 ## Compute
 for fi, freq in enumerate(frequency):
-    wl = snowScatt._compute._c/freq
+    wl = snowScatt._compute._c/freq.values
     for ti, temp in enumerate(temperature):
-        SS_RGA = snowScatt.calcProperties(diameters=sizes,
+        SS_RGA = snowScatt.calcProperties(diameters=Dmax,
                                           wavelength=wl,
                                           properties=particle,
-                                          temperature=temp,
+                                          temperature=temp.values,
                                           Nangles=Nangles)
-        ssCext, ssCabs, ssCsca, ssCbck, ssasym, ssphase, mass_prop, ssvel = SS_RGA
+        ssCext, ssCabs, ssCsca, ssCbck, ssasym, ssphase, mass_p, ssvel = SS_RGA
         Cext.loc[sizes, freq, temp] = ssCext
         Cabs.loc[sizes, freq, temp] = ssCabs
         Csca.loc[sizes, freq, temp] = ssCsca
         Cbck.loc[sizes, freq, temp] = ssCbck
         asym.loc[sizes, freq, temp] = ssasym
         phase.loc[sizes, angles, freq, temp] = ssphase
+
 # These last two depend only on size, no need to recompute
-mass.loc[sizes] = mass_prop
+mass.loc[sizes] = mass_p
 vel.loc[sizes] = ssvel
 
 
 ## Finalize dataset and write netCDF file
-
 variables = {'Cext':Cext,
              'Cabs':Cabs,
              'Csca':Csca,
@@ -82,6 +90,7 @@ variables = {'Cext':Cext,
              'phase':phase,
              'mass':mass,
              'vel':vel,}
+
 global_attributes = {'created_by':os.environ['USER'],
                      'host_machine':socket.gethostname(),
                      'particle_properties':particle,

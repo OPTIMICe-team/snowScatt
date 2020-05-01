@@ -83,5 +83,5 @@ if __name__ == "__main__":
         package_data = {'snowScatt.snowProperties': ['*.dat'],
                         'snowScatt.refractiveIndex': ['*.dat'],},
         platforms = ['any'],
-        requires = ['numpy', 'scipy', 'Cython', 'pandas', 'os'],
+        requires = ['numpy', 'scipy', 'Cython', 'pandas', 'os', 'xarray'],
         ext_modules=cythonize([ssrgalib]))
