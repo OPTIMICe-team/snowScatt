@@ -80,7 +80,7 @@ if __name__ == "__main__":
                      'snowScatt.snowProperties': 'python/snowProperties',
                      'snowScatt.refractiveIndex': 'python/refractiveIndex',
                      'snowScatt.instrumentSimulator': 'python/instrumentSimulator'},
-        package_data = {'snowScatt.snowProperties': ['*.dat'],
+        package_data = {'snowScatt.snowProperties': ['*.csv'],
                         'snowScatt.refractiveIndex': ['*.dat'],},
         platforms = ['any'],
         requires = ['numpy', 'scipy', 'Cython', 'pandas', 'os', 'xarray'],

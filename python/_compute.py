@@ -76,7 +76,7 @@ def _prepare_input(diameters, wavelength, properties, ref_index, temperature,
         ref_index = ref_index*np.ones_like(diameters)
         #print(type(ref_index), ref_index.shape, ref_index)
 
-    kappa, beta, gamma, zeta1, alpha_eff, ar_mono, mass_prop, vel = snowLibrary(diameters, properties)
+    kappa, beta, gamma, zeta1, alpha_eff, ar_mono, mass_prop, vel, area = snowLibrary(diameters, properties)
     
     if mass is None:
         print('compute masses from snow properties')
@@ -90,7 +90,7 @@ def _prepare_input(diameters, wavelength, properties, ref_index, temperature,
 
     Deff = _compute_effective_size(diameters, alpha_eff, theta)
 
-    return Deff, Vol, wavelength, K, kappa, gamma, beta, zeta1, mass_prop, vel
+    return Deff, Vol, wavelength, K, kappa, gamma, beta, zeta1, mass_prop, vel, area
 
 
 def calcProperties(diameters, wavelength, properties, ref_index=None,
@@ -178,12 +178,12 @@ def calcProperties(diameters, wavelength, properties, ref_index=None,
 
     params = _prepare_input(diameters, wavelength, properties,
                             ref_index, temperature, mass, theta)
-    Deff, Vol, wavelength, K, kappa, gamma, beta, zeta1, mass_prop, vel = params
+    Deff, Vol, wavelength, K, kappa, gamma, beta, zeta1, mass_prop, vel, area = params
     Cext, Cabs, Csca, Cbck, asym, phase = ssrga(Deff, Vol, wavelength, K,
                                                 kappa, gamma, beta, zeta1,
                                                 Nangles)
 
-    return Cext, Cabs, Csca, Cbck, asym, phase, mass_prop, vel
+    return Cext, Cabs, Csca, Cbck, asym, phase, mass_prop, vel, area
 
 
 def backscatter(diameters, wavelength, properties, ref_index=None,
@@ -198,7 +198,7 @@ def backscatter(diameters, wavelength, properties, ref_index=None,
     """
     params = _prepare_input(diameters, wavelength, properties,
                             ref_index, temperature, mass, theta)
-    Deff, Vol, wavelength, K, kappa, gamma, beta, zeta1, mass_prop, vel = params
+    Deff, Vol, wavelength, K, kappa, gamma, beta, zeta1, mass_prop, vel, area = params
     
     return ssrgaBack(Deff, Vol, wavelength, K, kappa, gamma, beta, zeta1)
 
@@ -213,6 +213,6 @@ def backscatVel(diameters, wavelength, properties, ref_index=None,
     """
     params = _prepare_input(diameters, wavelength, properties,
                             ref_index, temperature, mass, theta)
-    Deff, Vol, wavelength, K, kappa, gamma, beta, zeta1, mass_prop, vel = params
+    Deff, Vol, wavelength, K, kappa, gamma, beta, zeta1, mass_prop, vel, area = params
     
     return ssrgaBack(Deff, Vol, wavelength, K, kappa, gamma, beta, zeta1), vel

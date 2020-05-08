@@ -28,27 +28,29 @@ from scipy import interp
 module_path = path.split(path.abspath(__file__))[0]
 
 
-def _interpolate_coeff(D, table, am, bm, av, bv):
-    beta = interp(D, table.index.values, table.beta_z)
-    gamma = interp(D, table.index.values, table.gamma_z) # TODO fix the name of the columns
-    kappa = interp(D, table.index.values, table.kappa_z)
-    zeta1 = interp(D, table.index.values, table.zeta1_z)
+def _interpolate_coeff(D, table, am, bm, av, bv, aa, ba, ar_mono=1.0):
+    beta = interp(D, table.index.values, table.beta)
+    gamma = interp(D, table.index.values, table.gamma)
+    kappa = interp(D, table.index.values, table.kappa)
+    zeta1 = interp(D, table.index.values, table.zeta)
     alpha_eff = interp(D, table.index.values, table.alpha_eff)
-    ar_mono = interp(D, table.index.values, table.ar_mono)
-    mass = interp(D, table.index.values, table.m, left=np.nan, right=np.nan)
-    vel = interp(D, table.index.values, table.vel, left=np.nan, right=np.nan)
+    ar_mono = np.ones_like(D)*ar_mono#interp(D, table.index.values, table.ar_mono)
+    mass = interp(D, table.index.values, table.mass, left=np.nan, right=np.nan)
+    vel = interp(D, table.index.values, table.vel_Bohm, left=np.nan, right=np.nan)
+    area = interp(D, table.index.values, table.area, left=np.nan, right=np.nan)
     mask = np.isnan(mass)
     mass[mask] = (am*D**bm)[mask]
     vel[mask] = (av*D**bv)[mask]
-    return beta, gamma, kappa, zeta1, alpha_eff, ar_mono, mass, vel
+    area[mask] = (aa*D**ba)[mask]
+    return beta, gamma, kappa, zeta1, alpha_eff, ar_mono, mass, vel, area
 
 ## Library of average parameters
 snowLib = {}
-libKeys = ['kappa', 'beta', 'gamma', 'zeta1', 'aspect', 'ar_mono', 'am', 'bm', 'av', 'bv', 'msg']
+libKeys = ['kappa', 'beta', 'gamma', 'zeta1', 'aspect', 'ar_mono', 'am', 'bm', 'av', 'bv', 'aa', 'ba', 'msg']
 
 # Mean parameters from Heymsfield Westbrook 2014 aggregates of bullet rosettes
 HW14 = {'kappa': 0.19, 'beta': 0.23, 'gamma': 5./3., 'zeta1': 1.,
-        'aspect': 0.6, 'am':0.015, 'bm':2.08, 'av':3.581, 'bv':0.3,
+        'aspect': 0.6, 'am':0.015, 'bm':2.08, 'av':3.581, 'bv':0.3, 'aa':np.nan, 'ba':np.nan,
         'ar_mono': 1.0, # Could it be that I have to consider ar of bullets not rosettes?
         'msg': 'Heymsfield and Westbrook 2014 aggregates of bullett rosettes'}
 snowLib['HW14'] = HW14
@@ -56,7 +58,7 @@ snowLib['HW14'] = HW14
 # Mean parameters derived for Leinonen-Szyrmer 2015 unrimed snow aggregates
 L15_0 = {'kappa': 0.189177, 'beta': 3.06939,
          'gamma': 2.53192, 'zeta1': 0.0709529,
-         'aspect': 0.6, 'am':0.015, 'bm':2.08, 'av':3.581, 'bv':0.3,
+         'aspect': 0.6, 'am':0.015, 'bm':2.08, 'av':3.581, 'bv':0.3, 'aa':np.nan, 'ba':np.nan,
          'ar_mono': 0.3,
          'msg': 'Leinonen 2015 unrimed aggregates of dendrites'}
 snowLib['LS15A0.0'] = L15_0
@@ -64,7 +66,7 @@ snowLib['LS15A0.0'] = L15_0
 # Mean parameters for Ori et al. 2014 unrimed assemblages of ice columns
 Oea14 = {'kappa': 0.190031, 'beta': 0.030681461,
          'gamma': 1.3002167, 'zeta1': 0.29466184,
-         'aspect': 0.6, 'am':0.015, 'bm':2.08, 'av':3.581, 'bv':0.3,
+         'aspect': 0.6, 'am':0.015, 'bm':2.08, 'av':3.581, 'bv':0.3, 'aa':np.nan, 'ba':np.nan,
          'ar_mono': 5.0,
          'msg':'Ori 2014 assemblages of columns'}
 snowLib['Oea14'] = Oea14
@@ -73,34 +75,89 @@ snowLib['Oea14'] = Oea14
 snowList = {}
 fileKeys = ['path', 'msg']
 # Leinonen 2015 Table for unrimed snowflakes
-L15tab00 = {'path':module_path+'/Jussi_0.0_fake.dat',
-            'msg':'Table of Leinonen unrimed snowflakes'}
-snowList['Leinonen15tab00'] = L15tab00
+L15tabA00 = {'path':module_path+'/ssrga_coeffs_simultaneous_0.0.csv',
+             'msg':'Table of Leinonen unrimed snowflakes'}
+snowList['Leinonen15tabA00'] = L15tabA00
 
-# Leinonen 2015 Table for rimed snowflakes ELWP=0.1
-L15tab01 = {'path':module_path+'/Jussi_0.1_fake.dat',
- 'msg':'Table of Leinonen rimed snowflakes ELWP=0.1'}
-snowList['Leinonen15tab01'] = L15tab01
+# Leinonen 2015 Table for rimed snowflakes ELWP=0.1 model A simultaneous
+L15tabA01 = {'path':module_path+'/ssrga_coeffs_simultaneous_0.1.csv',
+             'msg':'Table of Leinonen rimed snowflakes ELWP=0.1 model A simultaneous'}
+snowList['Leinonen15tabA01'] = L15tabA01
 
-# Leinonen 2015 Table for rimed snowflakes ELWP=0.2
-L15tab02 = {'path':module_path+'/Jussi_0.2_fake.dat',
- 'msg':'Table of Leinonen rimed snowflakes ELWP=0.2'}
-snowList['Leinonen15tab02'] = L15tab02
+# Leinonen 2015 Table for rimed snowflakes ELWP=0.2 model A simultaneous
+L15tabA02 = {'path':module_path+'/ssrga_coeffs_simultaneous_0.2.csv',
+             'msg':'Table of Leinonen rimed snowflakes ELWP=0.2 model A simultaneous'}
+snowList['Leinonen15tabA02'] = L15tabA02
 
-# Leinonen 2015 Table for rimed snowflakes ELWP=0.5
-L15tab05 = {'path':module_path+'/Jussi_0.5_fake.dat',
- 'msg':'Table of Leinonen rimed snowflakes ELWP=0.5'}
-snowList['Leinonen15tab05'] = L15tab05
+# Leinonen 2015 Table for rimed snowflakes ELWP=0.5 model A simultaneous
+L15tabA05 = {'path':module_path+'/ssrga_coeffs_simultaneous_0.5.csv',
+             'msg':'Table of Leinonen rimed snowflakes ELWP=0.5 model A simultaneous'}
+snowList['Leinonen15tabA05'] = L15tabA05
 
-# Leinonen 2015 Table for rimed snowflakes ELWP=1.0
-L15tab10 = {'path':module_path+'/Jussi_1.0_fake.dat',
- 'msg':'Table of Leinonen rimed snowflakes ELWP=1.0'}
-snowList['Leinonen15tab10'] = L15tab10
+# Leinonen 2015 Table for rimed snowflakes ELWP=1.0 model A simultaneous
+L15tabA10 = {'path':module_path+'/ssrga_coeffs_simultaneous_1.0.csv',
+             'msg':'Table of Leinonen rimed snowflakes ELWP=1.0 model A simultaneous'}
+snowList['Leinonen15tabA10'] = L15tabA10
 
-# Leinonen 2015 Table for rimed snowflakes ELWP=2.0
-L15tab20 = {'path':module_path+'/Jussi_2.0_fake.dat',
- 'msg':'Table of Leinonen rimed snowflakes ELWP=2.0'}
-snowList['Leinonen15tab20'] = L15tab20
+# Leinonen 2015 Table for rimed snowflakes ELWP=2.0 model A simultaneous
+L15tabA20 = {'path':module_path+'/ssrga_coeffs_simultaneous_2.0.csv',
+             'msg':'Table of Leinonen rimed snowflakes ELWP=2.0 model A simultaneous'}
+snowList['Leinonen15tabA20'] = L15tabA20
+
+# Leinonen 2015 Table for rimed snowflakes ELWP=0.1 model B subsequent
+L15tabB01 = {'path':module_path+'/ssrga_coeffs_subsequent_0.1.csv',
+             'msg':'Table of Leinonen rimed snowflakes ELWP=0.1 model B subsequent'}
+snowList['Leinonen15tabB01'] = L15tabA01
+
+# Leinonen 2015 Table for rimed snowflakes ELWP=0.2 model B subsequent
+L15tabB02 = {'path':module_path+'/ssrga_coeffs_subsequent_0.2.csv',
+             'msg':'Table of Leinonen rimed snowflakes ELWP=0.2 model B subsequent'}
+snowList['Leinonen15tabB02'] = L15tabA02
+
+# Leinonen 2015 Table for rimed snowflakes ELWP=0.5 model B subsequent
+L15tabB05 = {'path':module_path+'/ssrga_coeffs_subsequent_0.5.csv',
+             'msg':'Table of Leinonen rimed snowflakes ELWP=0.5 model B subsequent'}
+snowList['Leinonen15tabB05'] = L15tabA05
+
+# Leinonen 2015 Table for rimed snowflakes ELWP=1.0 model B subsequent
+L15tabB10 = {'path':module_path+'/ssrga_coeffs_subsequent_1.0.csv',
+             'msg':'Table of Leinonen rimed snowflakes ELWP=1.0 model B subsequent'}
+snowList['Leinonen15tabB10'] = L15tabA10
+
+# Leinonen 2015 Table for rimed snowflakes ELWP=2.0 model B subsequent
+L15tabB20 = {'path':module_path+'/ssrga_coeffs_subsequent_2.0.csv',
+             'msg':'Table of Leinonen rimed snowflakes ELWP=2.0 model B subsequent'}
+snowList['Leinonen15tabB20'] = L15tabA20
+
+# Leinonen 2015 Table for rimed snowflakes model C rimeonly
+L15tabC = {'path':module_path+'/ssrga_coeffs_rimec.csv',
+           'msg':'Table of Leinonen rime only graupel'}
+snowList['Leinonen15tabC'] = L15tabC
+
+# Leonie von Terzi Table for unrimed assmblages of dendrites
+LvTdendrite = {'path':module_path+'/ssrga_coeffs_dendrite.csv',
+               'msg':'Table of von Terzi assemblages of dendrites'}
+snowList['vonTerzi_dendrite'] = LvTdendrite
+
+# Leonie von Terzi Table for unrimed assmblages of columns
+LvTcolumn = {'path':module_path+'/ssrga_coeffs_column.csv',
+             'msg':'Table of von Terzi assemblages of columns'}
+snowList['vonTerzi_column'] = LvTcolumn
+
+# Leonie von Terzi Table for unrimed assmblages of plates
+LvTplate = {'path':module_path+'/ssrga_coeffs_plate.csv',
+            'msg':'Table of von Terzi assemblages of plates'}
+snowList['vonTerzi_plate'] = LvTplate
+
+# Leonie von Terzi Table for unrimed assmblages of needles
+LvTneedle = {'path':module_path+'/ssrga_coeffs_needle.csv',
+             'msg':'Table of von Terzi assemblages of needles'}
+snowList['vonTerzi_needle'] = LvTneedle
+
+# Leonie von Terzi Table for unrimed assmblages of mixtures of columns and dendrites
+LvTmixcoldend = {'path':module_path+'/ssrga_coeffs_mixcolumndend.csv',
+           'msg':'Table of von Terzi assemblages of mixtures of columns and dendrites'}
+snowList['vonTerzi_mixcoldend'] = LvTmixcoldend
 
 
 ## Class to manage the library of snow properties
@@ -123,6 +180,7 @@ class snowProperties():
 			ar_mono = np.ones_like(diameters)*self._library[identifier]['ar_mono']
 			mass = self._library[identifier]['am']*diameters**self._library[identifier]['bm']
 			vel = self._library[identifier]['av']*diameters**self._library[identifier]['bv']
+			area = self._library[identifier]['aa']*diameters**self._library[identifier]['ba']
 
 		elif identifier in self._fileList.keys():
 			#print('got TABLE ', identifier, self._fileList[identifier])
@@ -132,11 +190,15 @@ class snowProperties():
 				bm = float(line.split('bm=')[-1].split(',')[0])
 				av = float(line.split('av=')[-1].split(',')[0])
 				bv = float(line.split('bv=')[-1].split(',')[0])
-			table = pd.read_csv(self._fileList[identifier]['path'], comment='#').set_index('D')
-			beta, gamma, kappa, zeta1, alpha_eff, ar_mono, mass, vel = _interpolate_coeff(diameters, table, am, bm, av, bv)
+				aa = float(line.split('aa=')[-1].split(',')[0])
+				ba = float(line.split('ba=')[-1].split(',')[0])
+				ar_mono = float(line.split('monomer_alpha=')[-1].split(',')[0])
+			table = pd.read_csv(self._fileList[identifier]['path'], comment='#').set_index('Diam_max').interpolate(limit_direction='both') # set index and fill nans inside
+
+			beta, gamma, kappa, zeta1, alpha_eff, ar_mono, mass, vel, area = _interpolate_coeff(diameters, table, am, bm, av, bv, aa, ba, ar_mono)
 		else:
 			raise AttributeError('I do not know ', identifier, 'call info() for a list of available properties\n')
-		return np.asarray(kappa), np.asarray(beta), np.asarray(gamma), np.asarray(zeta1), np.asarray(alpha_eff), np.asarray(ar_mono), np.asarray(mass), np.asarray(vel)
+		return np.asarray(kappa), np.asarray(beta), np.asarray(gamma), np.asarray(zeta1), np.asarray(alpha_eff), np.asarray(ar_mono), np.asarray(mass), np.asarray(vel), np.asarray(area)
 
 	def add_snow(self, label, newSnowDict):
 		if all (key in newSnowDict for key in (libKeys)):
