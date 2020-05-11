@@ -11,7 +11,7 @@ Dmax = np.linspace(0.1e-3, 1.0e-1, 1000) # list of sizes
 sizes = xr.IndexVariable(dims='size', data=Dmax,
                          attrs={'long_name':'Size - Maximum dimension',
                                 'units':'meters'})
-particle = 'Leinonen15tabA00'
+particle = 'Leinonen15tabA02'
 frequency =  np.array([5.6e9, 9.6e9, 13.6e9, 35.6e9, 94.0e9]) # frequencies
 frequency = xr.IndexVariable(dims='frequency', data=frequency,
                              attrs={'units':'Hertz'})
@@ -22,7 +22,7 @@ angles = xr.IndexVariable(dims='scat_angle',
                           data=np.linspace(0, np.pi, Nangles),
                           attrs={'long_name':'scattering angle',
                                  'units':'radians'})
-filename = 'leinonen_unrimed_LUT.nc' # output filename
+filename = 'leinonen_A02_LUT.nc' # output filename
 
 ## Create empty xarray variables
 dims = ['size', 'frequency', 'temperature']
