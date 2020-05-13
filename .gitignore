@@ -1,4 +1,7 @@
 cython/*.c
+data/
+examples/*.nc
+examples/*.png
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
