@@ -81,7 +81,7 @@ def _calc_vector_true_length(A):
 
 	Returns
 	-------
-	n : integer
+	n : scalar integer
 		True cropped length of vectors of A. N>=n
 	"""
 
@@ -104,7 +104,34 @@ index = np.abs(X) <= 0.5
 Xfit = X[index]
 
 def _normalize_area_functions(A):
-	# Scale 
+	"""
+	Normalize the area function into a common nX wide vector. Centers of mass
+	are shifted so that they lie at the center of the vectors. nX is usually a
+	power of 2 to make the FFT faster.
+	TODO: Possibly for very large high resolved particles the number of bins in
+	the normalized vector is not high enough. It might be that we are losing
+	resolution!! Is it truly a problem? => scaling of the monomers are neglected
+	anyway, but in principle the details of the particle morphology matter at
+	very high frequency
+
+	Parameters
+	----------
+	A : array(Nbins) integer
+		Vector array of single valued elements (preferably integers).
+		Contains the original area function
+
+	Returns
+	-------
+	Anorm : array(nX) - double
+		Vector of rescaled area function. The center of mass is shifted at the
+		center of the vector. Area function is interpolated from the original
+		Does not matter if it is integral conserved. The mass is calculated
+		outside and every vector is normalized
+	nx : scalar - integer
+		Length (in number of bins) of the original area function. Basically the
+		length of the particle along the propagation direction
+	"""
+	# Get the true length in number of bins
 	nx = _calc_vector_true_length(A)
 	x = np.linspace(0, len(A)/nx, len(A))
 	x = x - np.sum(x*A)/np.sum(A)
@@ -117,12 +144,30 @@ def _normalize_area_functions(A):
 
 
 def _compute_power_spectrum(Adiff):
+	"""
+	Compute the power spectrum of the input vector using the FFT algorithm
+	Parameters
+	----------
+	Adiff : array - double
+		One dimensional real array. Expectes the deviations of a particular
+		area function sample from the average area function shape
+
+	Returns
+	-------
+	P : array (2*len(Adiff)) double
+		Power spectrum of the input vector
+
+	"""
 	F = fft(Adiff)
 	nF = len(F)
 	return np.real(F*F.conj()*2.0/(nF*nF))
 
-# nominal_size = 0.01 # This is not needed here. it can be treated externally, it is just the bin center. perhaps it is more useful than Dmax when computing alpha_eff??
-def fitSSRGA(A, Dmax, voxel_spacing, max_index_largescale=12, do_plots=False):
+# nominal_size = 0.01 # This is not needed here. 
+# it can be treated externally, it is just the bin center. 
+# perhaps it is more useful than Dmax when computing alpha_eff??
+def fitSSRGA(A, Dmax, voxel_spacing,
+	         max_index_largescale=12,
+	         do_plots=False, plots_path=None):
 	"""
 	Fit SSRGA parameter kappa, beta, gamma, zeta
 
@@ -147,6 +192,9 @@ def fitSSRGA(A, Dmax, voxel_spacing, max_index_largescale=12, do_plots=False):
 		gamma and beta parameters
 	do_plots : bool
 		If True plots the average shape and the power spectrum fits
+	plots_path : string
+		If not None, save the plots at the specified path. Appends a meaningful
+		suffix and uses .png format
 
 	Returns
 	-------
@@ -188,7 +236,7 @@ def fitSSRGA(A, Dmax, voxel_spacing, max_index_largescale=12, do_plots=False):
 	# Rescale area functions for fft processing - and
 	# Compute the length of each vector and derive aspect ratio
 	Anorm = np.apply_along_axis(func1d=_normalize_area_functions, axis=1, arr=A)
-	nx = Anorm[:, 1]#np.apply_along_axis(func1d=_calc_vector_true_length, axis=1, arr=A)
+	nx = Anorm[:, 1]
 	Anorm = np.stack(Anorm[:, 0])
 	mean_nx = nx.reshape((Nparticles, Nsamples)).mean(axis=1)
 	alpha_eff = (mean_nx*voxel_spacing/Dmax).mean()
@@ -209,28 +257,27 @@ def fitSSRGA(A, Dmax, voxel_spacing, max_index_largescale=12, do_plots=False):
 	E = np.apply_along_axis(func1d=_compute_power_spectrum, axis=1, arr=Adiff)
 
 	sum_power_spectrum = E[:, 1:nXfit//2+1].sum(axis=0) # Ignore first element: represents the mean of the field
-	sum_log_power_spectrum = np.log(E[:, 1:nXfit//2+1]).sum(axis=0)
+	# sum_log_power_spectrum = np.log(E[:, 1:nXfit//2+1]).sum(axis=0)
 	power_spectrum = sum_power_spectrum / Nvectors # average
 	
 	index_largescale = np.arange(1, max_index_largescale, 1)
-	variance_largescale = (np.sum(power_spectrum[index_largescale])).real
-	print(nXfit, variance_largescale)
+	#variance_largescale = (np.sum(power_spectrum[index_largescale])).real
+	
 	print('PARSEVAL', np.sum(power_spectrum)/np.var(Adiff[:]))
-	print(index_largescale)
 
-	j = np.arange(1, nXfit//2+1)
-
+	j = np.arange(1, nXfit//2+1) # All the meaningful wavenumbers, start from 1
+	# Fit the P = beta*(2j)**-gamma function
 	gamma, beta = np.polyfit(x=np.log10(2*(index_largescale+1)),
 		                     y=np.log10(power_spectrum[index_largescale]),
 		                     deg=1)
 
-	beta = 10.0**(beta)*(8.0/np.pi**2)
-	gamma*=-1
-	power_spectrum_fit = (2*j)**-gamma
+	beta = 10.0**(beta)*(8.0/np.pi**2) # rescale beta
+	gamma*=-1 # change sign of gamma
+	power_spectrum_fit = (2*j)**-gamma # calculate the fitted power spectrum
 	power_spectrum_fit = beta*power_spectrum_fit*np.pi**2/8.0 # rescale back
-	zeta = power_spectrum[0]/power_spectrum_fit[0]
+	zeta = power_spectrum[0]/power_spectrum_fit[0] # fix the first element
 
-	if do_plots:
+	if do_plots: # TODO make it save them somewhere if asked to
 		plt.figure()
 		plt.plot(X, Anorm.mean(axis=0))
 		plt.plot(Xfit, Afit)

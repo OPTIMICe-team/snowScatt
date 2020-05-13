@@ -14,6 +14,8 @@ If you do not have writing permission on your pythonpath you can also append the
 Notes on how to install on Windows using anaconda
 *************************************************
 
+SO FAR I DID NOT MANAGE TO INSTALL IT ON WINDOWS
+
 Install Anaconda
 
 If you do not have a C compiler you need to install one
