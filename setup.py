@@ -76,12 +76,16 @@ if __name__ == "__main__":
                     'snowScatt.snowProperties',
                     'snowScatt.refractiveIndex',
                     'snowScatt.instrumentSimulator',
-                    'snowScatt.ssrga'],
+                    'snowScatt.ssrga',
+                    'snowScatt.fallSpeed'
+                    ],
         package_dir={'snowScatt': 'python' ,
                      'snowScatt.snowProperties': 'python/snowProperties',
                      'snowScatt.refractiveIndex': 'python/refractiveIndex',
                      'snowScatt.instrumentSimulator': 'python/instrumentSimulator',
-                     'snowScatt.ssrga': 'python/ssrga'},
+                     'snowScatt.ssrga': 'python/ssrga',
+                     'snowScatt.fallSpeed': 'python/fallSpeed'
+                     },
         package_data = {'snowScatt.snowProperties': ['*.csv'],
                         'snowScatt.refractiveIndex': ['*.dat'],},
         platforms = ['any'],

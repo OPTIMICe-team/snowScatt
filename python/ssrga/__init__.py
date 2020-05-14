@@ -1,1 +1,1 @@
-from .ssrgaFit import fitSSRGA
+from ._ssrgaFit import fitSSRGA

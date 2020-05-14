@@ -1,1 +1,1 @@
-from .readProperties import snowLibrary
+from ._readProperties import snowLibrary
