@@ -1,8 +1,6 @@
 import numpy as np
-
-
-g = 9.807 # a value for gravity acceleration m/s**2
-rho_ice = 917.0 # a value for the density of solid ice Ih kg/m**3
+from snowScatt._constants import _g as g
+from snowScatt._constants import _ice_density as rho_ice
 
 
 def Boehm92(diam, rho_air, nu_air, mass, area, as_ratio=1.0):

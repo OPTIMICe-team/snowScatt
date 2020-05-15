@@ -26,9 +26,8 @@ from snowScatt.ssrgalib import ssrgaBack
 from snowScatt.ssrgalib import hexPrismK
 from snowScatt.snowProperties import snowLibrary
 from snowScatt.refractiveIndex import ice
-
-_c = 2.99792458e8
-_ice_density = 917.0
+from snowScatt._constants import _c
+from snowScatt._constants import _ice_density
 
 
 def _compute_effective_size(size=None, ar=None, angle=None):
