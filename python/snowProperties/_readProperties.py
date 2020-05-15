@@ -24,25 +24,35 @@ import pandas as pd
 import numpy as np
 from os import path
 from scipy import interp
+from snowScatt.fallSpeed import Boehm1992
+from snowScatt.fallSpeed import Boehm1989
+from snowScatt.fallSpeed import HeymsfieldWestbrook2010
+from snowScatt.fallSpeed import KhvorostyanovCurry2005
+from snowScatt._constants import _ice_density
 
 module_path = path.split(path.abspath(__file__))[0]
 
+fallspeeds = {'HeymsfieldWestbrook10':HeymsfieldWestbrook2010,
+			  'KhvorostyanovCurry05':KhvorostyanovCurry2005,
+			  'Boehm92':Boehm1992,
+			  'Boehm89':Boehm1989,
+			 }
 
-def _interpolate_coeff(D, table, am, bm, av, bv, aa, ba, ar_mono=1.0):
+
+def _interpolate_coeff(D, table, ar_mono=1.0):
     beta = interp(D, table.index.values, table.beta)
     gamma = interp(D, table.index.values, table.gamma)
     kappa = interp(D, table.index.values, table.kappa)
     zeta1 = interp(D, table.index.values, table.zeta)
     alpha_eff = interp(D, table.index.values, table.alpha_eff)
     ar_mono = np.ones_like(D)*ar_mono#interp(D, table.index.values, table.ar_mono)
+    # TODO evaluate to shift these to another function
     mass = interp(D, table.index.values, table.mass, left=np.nan, right=np.nan)
     vel = interp(D, table.index.values, table.vel_Bohm, left=np.nan, right=np.nan)
     area = interp(D, table.index.values, table.area, left=np.nan, right=np.nan)
-    mask = np.isnan(mass)
-    mass[mask] = (am*D**bm)[mask]
-    vel[mask] = (av*D**bv)[mask]
-    area[mask] = (aa*D**ba)[mask]
+
     return beta, gamma, kappa, zeta1, alpha_eff, ar_mono, mass, vel, area
+
 
 ## Library of average parameters
 snowLib = {}
@@ -161,14 +171,13 @@ snowList['vonTerzi_mixcoldend'] = LvTmixcoldend
 
 
 ## Class to manage the library of snow properties
-
 class snowProperties():
 	def __init__(self):
 		self._library = snowLib
 		self._fileList = snowList
 		print('Initialize a library of snow properties')
 
-	def __call__(self, diameters, identifier):
+	def __call__(self, diameters, identifier, velocity_model='Boehm92'):
 		#print('return the snow properties for selected sizes')
 		if identifier in self._library.keys():
 			#print('got AVG ', identifier, self._library[identifier])
@@ -179,7 +188,7 @@ class snowProperties():
 			alpha_eff = np.ones_like(diameters)*self._library[identifier]['aspect']
 			ar_mono = np.ones_like(diameters)*self._library[identifier]['ar_mono']
 			mass = self._library[identifier]['am']*diameters**self._library[identifier]['bm']
-			vel = self._library[identifier]['av']*diameters**self._library[identifier]['bv']
+			# vel = self._library[identifier]['av']*diameters**self._library[identifier]['bv']
 			area = self._library[identifier]['aa']*diameters**self._library[identifier]['ba']
 
 		elif identifier in self._fileList.keys():
@@ -195,10 +204,23 @@ class snowProperties():
 				ar_mono = float(line.split('monomer_alpha=')[-1].split(',')[0])
 			table = pd.read_csv(self._fileList[identifier]['path'], comment='#').set_index('Diam_max').interpolate(limit_direction='both') # set index and fill nans inside
 
-			beta, gamma, kappa, zeta1, alpha_eff, ar_mono, mass, vel, area = _interpolate_coeff(diameters, table, am, bm, av, bv, aa, ba, ar_mono)
+			beta, gamma, kappa, zeta1, alpha_eff, ar_mono, mass, vel, area = _interpolate_coeff(diameters, table, ar_mono)
+			mass = am*diameters**bm
+			area = aa*diameters**ba
+
 		else:
 			raise AttributeError('I do not know ', identifier, 'call info() for a list of available properties\n')
+		
+		# Limit density to solid ice sphere and area to full disk
+		a_disk = 0.25*np.pi*diameters**2
+		m_solid = 2.0*a_disk*diameters*_ice_density/3.0
+		area = np.minimum(a_disk, area)
+		mass = np.minimum(m_solid, mass)
+
+		vel = fallspeeds[velocity_model](diameters, mass, area) # TODO also need to pass kwargs additional
+
 		return np.asarray(kappa), np.asarray(beta), np.asarray(gamma), np.asarray(zeta1), np.asarray(alpha_eff), np.asarray(ar_mono), np.asarray(mass), np.asarray(vel), np.asarray(area)
+
 
 	def add_snow(self, label, newSnowDict):
 		if all (key in newSnowDict for key in (libKeys)):
@@ -209,6 +231,7 @@ class snowProperties():
 			self._fileList[label] = newSnowDict
 		else:
 			raise AttributeError('I do not recognize the newSnowDict attribute.\n You have to either pass a new dictionary of average properties (keys: {}) or a dictionary for a table file (keys: {}).\n'.format(libKeys, fileKeys))
+
 
 	def info(self, section='all'):
 		print('print the information content in the database\n')
@@ -228,4 +251,6 @@ class snowProperties():
 		print('\n\n######################################\nThis is the content of '+section+' sections of the database')
 		print('You can pass the argument section=["all", "avg", "tables"] to restrict the output to a certain section')
 
+
+# Create the Library
 snowLibrary = snowProperties()

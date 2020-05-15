@@ -1,9 +1,45 @@
 import numpy as np
 from snowScatt._constants import _g as g
 from snowScatt._constants import _ice_density as rho_ice
+from snowScatt._constants import _rho0
+from snowScatt._constants import _nu0
 
 
-def Boehm92(diam, rho_air, nu_air, mass, area, as_ratio=1.0):
+def correctionFooteduToit(vel, rho_air, temperature, rho0=_rho0, T0=293.15):
+	"""
+	Correction of the terminal fallspeed due to non standard air density. Use
+	Foote, G. B. & Du Toit, P. S. Terminal Velocity of Raindrops Aloft.
+	Journal of Applied Meteorology 8, 249–253 (1969).
+	Here it is assumed that the standard conditions are p=101325 Pa, T=20°C
+	and thus air_density = 1.2038631624242195 kg/m**3
+
+	Parameters
+	----------
+	vel : array(Nvel) - double
+		vector of terminal fallSpeed assumed at mean sea level conditions
+	rho_air : scalar double
+		actual air density kg/m**3
+	temperature : scalar double
+		actual air temperature
+	rho0 : scalar double
+		standard air density
+	T0 : scalar double
+		standard temperature 
+
+	Returns
+	-------
+	corrected_velocity : array(Nvel) - double
+		Corrected by air viscosity scaling due to non standard air density and
+		temperature
+
+	"""
+	log_density_scale = np.log10(rho0/rho_air)
+	Y = 0.43*log_density_scale-0.4*(log_density_scale)**2.5
+	return vel*10.0**Y*(1.0+(0.0023*(1.1-(rho_air/rho0))*(T0-temperature)))
+
+
+def Boehm1992(diam, mass, area,
+	          rho_air=_rho0, nu_air=_nu0, as_ratio=1.0):
 	"""
 	TODO PUT SOME REFERENCE HERE
 
@@ -55,7 +91,8 @@ def Boehm92(diam, rho_air, nu_air, mass, area, as_ratio=1.0):
 	return vterm_bohm
 
 
-def Boehm89(diam, rho_air, nu_air, mass, area):
+def Boehm1989(diam, mass, area,
+	          rho_air=_rho0, nu_air=_nu0):
 	"""
 	TODO PUT SOME REFERENCE HERE
 
@@ -100,7 +137,8 @@ def Boehm89(diam, rho_air, nu_air, mass, area):
 	return vterm_bohm
 
 
-def HeymsfieldWestbrook2010(diaSpec_SI, rho_air_SI, nu_SI, mass, area, k=0.5):
+def HeymsfieldWestbrook2010(diaSpec, mass, area,
+	                        rho_air=_rho0, nu_air=_nu0, k=0.5):
 	"""
 	Heymsfield, A. J. & Westbrook, C. D. Advances in the Estimation of Ice Particle Fall Speeds
     Using Laboratory and Field Measurements. Journal of the Atmospheric Sciences 67, 2469–2482 (2010).
@@ -108,11 +146,11 @@ def HeymsfieldWestbrook2010(diaSpec_SI, rho_air_SI, nu_SI, mass, area, k=0.5):
 
     Parameters:
     -----------
-    diaSpec_SI : array(Nparticles) double
+    diaSpec : array(Nparticles) double
     	spectrum of diameters of the particles [meters]
-    rho_air_SI : scalar double
+    rho_air : scalar double
     	air density [kilograms/meter**3]
-    nu_SI : scalar double
+    nu_air : scalar double
     	air kinematic viscosity [meters**2/seconds]
     mass : array(Nparticles) double
     	mass of the particles [kilograms]
@@ -129,17 +167,18 @@ def HeymsfieldWestbrook2010(diaSpec_SI, rho_air_SI, nu_SI, mass, area, k=0.5):
 	delta_0 = 8.0
 	C_0 = 0.35
 	
-	area_proj = area/((np.pi/4.)*diaSpec_SI**2) # area ratio
-	eta = nu_SI * rho_air_SI #!now dynamic viscosity
+	area_proj = area/((np.pi/4.)*diaSpec**2) # area ratio
+	eta = nu_air * rho_air #!now dynamic viscosity
 
-	Xstar = 8.0*rho_air_SI*mass*g/(np.pi*area_proj**(1.0-k)*eta**2)# !eq 9
+	Xstar = 8.0*rho_air*mass*g/(np.pi*area_proj**(1.0-k)*eta**2)# !eq 9
 	Re=0.25*delta_0**2*((1.0+((4.0*Xstar**0.5)/(delta_0**2.0*C_0**0.5)))**0.5 - 1 )**2 #!eq10
 	 
-	velSpec = eta*Re/(rho_air_SI*diaSpec_SI)
+	velSpec = eta*Re/(rho_air*diaSpec)
 	return velSpec
 
 
-def KhvorostyanovCurry2005(diam, rho_air, nu_air, mass, area, smooth=False):
+def KhvorostyanovCurry2005(diam, mass, area,
+	                       rho_air=_rho0, nu_air=_nu0, smooth=False):
 	"""
 	TODO PUT SOME REFERENCE HERE
 

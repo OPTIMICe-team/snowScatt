@@ -4,14 +4,15 @@ from datetime import datetime
 import numpy as np
 import xarray as xr
 import snowScatt
+import matplotlib.pyplot as plt
 
 ## Input parameters
 
-Dmax = np.linspace(0.1e-3, 1.0e-1, 1000) # list of sizes
+Dmax = np.linspace(0.1e-3, 20.0e-3, 1000) # list of sizes
 sizes = xr.IndexVariable(dims='size', data=Dmax,
                          attrs={'long_name':'Size - Maximum dimension',
                                 'units':'meters'})
-particle = 'Leinonen15tabA02'
+particle = 'Leinonen15tabA20'
 frequency =  np.array([5.6e9, 9.6e9, 13.6e9, 35.6e9, 94.0e9]) # frequencies
 frequency = xr.IndexVariable(dims='frequency', data=frequency,
                              attrs={'units':'Hertz'})
@@ -22,7 +23,7 @@ angles = xr.IndexVariable(dims='scat_angle',
                           data=np.linspace(0, np.pi, Nangles),
                           attrs={'long_name':'scattering angle',
                                  'units':'radians'})
-filename = 'leinonen_A02_LUT.nc' # output filename
+filename = 'leinonen_A20_LUT.nc' # output filename
 
 ## Create empty xarray variables
 dims = ['size', 'frequency', 'temperature']
@@ -79,6 +80,18 @@ for fi, freq in enumerate(frequency):
         Cbck.loc[sizes, freq, temp] = ssCbck
         asym.loc[sizes, freq, temp] = ssasym
         phase.loc[sizes, angles, freq, temp] = ssphase
+#        f, axs = plt.subplots(2, 2)
+#        axs[0, 0].loglog(Dmax, ssCbck)
+#        axs[0, 0].set_ylabel('backscattering')
+#        axs[0, 1].loglog(Dmax, mass_p)
+#        axs[0, 1].set_ylabel('mass')
+#        axs[1, 0].semilogx(Dmax, ssvel)
+#        axs[1, 0].set_ylabel('velocity')
+#        axs[1, 1].loglog(Dmax, ssarea)
+#        axs[1, 1].set_ylabel('area')
+#        f.suptitle(str(freq.values*1.0e-9)+'GHz   '+str(temp.values)+' K')
+#        f.savefig(str(freq.values*1.0e-9)+'_'+str(temp.values)+'.png')
+        
 
 # These last two depend only on size, no need to recompute
 mass.loc[sizes] = mass_p
