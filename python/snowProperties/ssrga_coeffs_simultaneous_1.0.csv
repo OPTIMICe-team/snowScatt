@@ -1,7 +1,7 @@
 # Table of coefficients for rimed dendritic aggregates (riming Mode A) from Leinonen and Szymer 2015 
 # author: Leonie von Terzi, email:lterzi@uni-koeln.de
 # Particles generated with monomers from an inverse exponential PSD, size parameter:650e-6, min_size:0.0001, max_size:0.003, grid_res:4e-5, riming_mode:simultaneous
-# am=0.17089460,bm=1.98052034,av=3.16357017,bv=0.01692403,aa=0.07434,ba=1.69154720,monomer_alpha=0.300
+# am=0.17089460,bm=1.98052034,av=3.16357017,bv=0.01692403,aa=0.07434,ba=1.69154720,monomer_alpha=0.300,
 Diam_max,mass,area,vel_Bohm,vel_KC,beta,gamma,kappa,zeta,alpha_eff
 2.000000e-03,7.171081e-07,1.995200e-06,2.398838e+00,2.201716e+00,3.497810e-01,2.882560e+00,1.622100e-01,1.309890e-01,8.414870e-01
 3.000000e-03,1.754187e-06,4.155200e-06,2.848849e+00,2.613427e+00,5.934340e-01,3.215250e+00,1.961790e-01,8.135140e-02,7.910810e-01

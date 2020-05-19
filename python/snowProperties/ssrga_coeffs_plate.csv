@@ -1,7 +1,7 @@
 # Table of coefficients for aggregates of plate generated with the aggregation code of Jussi Leinonen available at https://github.com/jleinonen/aggregation 
 # author: Leonie von Terzi, email:lterzi@uni-koeln.de
 # Particles generated with an inverse exponential PSD of monomers, size parameters varying from 50e-6 to 9.32e-3m,min_size:100e-6m,max_size:3000e-6,grid_res:1e-5,the following velocity fits were calculated with a power law from Boehm relation
-# am=0.04067016,bm=2.05353732,av=3.24587728,bv=0.20136458,aa=0.12579,ba=1.88096800,monomer_alpha=0.061
+# am=0.04067016,bm=2.05353732,av=3.24587728,bv=0.20136458,aa=0.12579,ba=1.88096800,monomer_alpha=0.061,
 Diam_max,mass,area,vel_Bohm,vel_KC,beta,gamma,kappa,zeta,alpha_eff
 8.750000e-04,1.451629e-08,2.401080e-07,4.581015e-01,6.544343e-01,1.251298e+01,3.559173e+00,1.819268e-01,2.179936e-02,8.115477e-01
 1.375000e-03,3.430734e-08,4.937020e-07,5.661203e-01,8.071136e-01,8.260267e+00,3.198344e+00,1.907803e-01,2.871083e-02,8.015377e-01
