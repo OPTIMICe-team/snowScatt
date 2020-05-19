@@ -1,7 +1,7 @@
 # Table of coefficients for aggregates of needle generated with the aggregation code of Jussi Leinonen available at https://github.com/jleinonen/aggregation 
 # author: Leonie von Terzi, email:lterzi@uni-koeln.de
 # Particles generated with an inverse exponential PSD of monomers, size parameters varying from 50e-6 to 9.32e-3m,min_size:100e-6m,max_size:3000e-6,grid_res:1e-5,the following velocity fits were calculated with a power law from Boehm relation
-# am=0.01621876,bm=2.01628354,av=4.61161240,bv=0.32977629,aa=0.02852,ba=1.74868548,monomer_alpha=12.335,
+# am=0.01621876,bm=2.01628354,av=4.61161240,bv=0.32977629,aa=0.02852,ba=1.74868548,monomer_alpha=12.335
 Diam_max,mass,area,vel_Bohm,vel_KC,beta,gamma,kappa,zeta,alpha_eff
 1.025000e-03,1.039779e-08,1.371346e-07,4.276051e-01,7.232308e-01,3.386514e+01,3.921829e+00,2.609496e-01,1.150244e-02,7.725134e-01
 1.525000e-03,2.680709e-08,3.098418e-07,5.445436e-01,9.040307e-01,2.997118e+01,3.713330e+00,2.538729e-01,1.232475e-02,7.650862e-01
