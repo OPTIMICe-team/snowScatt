@@ -117,27 +117,27 @@ snowList['Leinonen15tabA20'] = L15tabA20
 # Leinonen 2015 Table for rimed snowflakes ELWP=0.1 model B subsequent
 L15tabB01 = {'path':module_path+'/ssrga_coeffs_subsequent_0.1.csv',
              'msg':'Table of Leinonen rimed snowflakes ELWP=0.1 model B subsequent'}
-snowList['Leinonen15tabB01'] = L15tabA01
+snowList['Leinonen15tabB01'] = L15tabB01
 
 # Leinonen 2015 Table for rimed snowflakes ELWP=0.2 model B subsequent
 L15tabB02 = {'path':module_path+'/ssrga_coeffs_subsequent_0.2.csv',
              'msg':'Table of Leinonen rimed snowflakes ELWP=0.2 model B subsequent'}
-snowList['Leinonen15tabB02'] = L15tabA02
+snowList['Leinonen15tabB02'] = L15tabB02
 
 # Leinonen 2015 Table for rimed snowflakes ELWP=0.5 model B subsequent
 L15tabB05 = {'path':module_path+'/ssrga_coeffs_subsequent_0.5.csv',
              'msg':'Table of Leinonen rimed snowflakes ELWP=0.5 model B subsequent'}
-snowList['Leinonen15tabB05'] = L15tabA05
+snowList['Leinonen15tabB05'] = L15tabB05
 
 # Leinonen 2015 Table for rimed snowflakes ELWP=1.0 model B subsequent
 L15tabB10 = {'path':module_path+'/ssrga_coeffs_subsequent_1.0.csv',
              'msg':'Table of Leinonen rimed snowflakes ELWP=1.0 model B subsequent'}
-snowList['Leinonen15tabB10'] = L15tabA10
+snowList['Leinonen15tabB10'] = L15tabB10
 
 # Leinonen 2015 Table for rimed snowflakes ELWP=2.0 model B subsequent
 L15tabB20 = {'path':module_path+'/ssrga_coeffs_subsequent_2.0.csv',
              'msg':'Table of Leinonen rimed snowflakes ELWP=2.0 model B subsequent'}
-snowList['Leinonen15tabB20'] = L15tabA20
+snowList['Leinonen15tabB20'] = L15tabB20
 
 # Leinonen 2015 Table for rimed snowflakes model C rimeonly
 L15tabC = {'path':module_path+'/ssrga_coeffs_rimec.csv',
