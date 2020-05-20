@@ -1,3 +1,24 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""
+Copyright (C) 2020 Davide Ori 
+University of Cologne
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+"""
+
 from scipy.fftpack import fft
 from scipy.interpolate import interp1d
 import numpy as np
@@ -162,9 +183,7 @@ def _compute_power_spectrum(Adiff):
 	nF = len(F)
 	return np.real(F*F.conj()*2.0/(nF*nF))
 
-# nominal_size = 0.01 # This is not needed here. 
-# it can be treated externally, it is just the bin center. 
-# perhaps it is more useful than Dmax when computing alpha_eff??
+
 def fitSSRGA(A, Dmax, voxel_spacing,
 	         max_index_largescale=12,
 	         do_plots=False, plots_path=None):
@@ -263,7 +282,7 @@ def fitSSRGA(A, Dmax, voxel_spacing,
 	index_largescale = np.arange(1, max_index_largescale, 1)
 	#variance_largescale = (np.sum(power_spectrum[index_largescale])).real
 	
-	print('PARSEVAL', np.sum(power_spectrum)/np.var(Adiff[:]))
+	#print('PARSEVAL', np.sum(power_spectrum)/np.var(Adiff[:]))
 
 	j = np.arange(1, nXfit//2+1) # All the meaningful wavenumbers, start from 1
 	# Fit the P = beta*(2j)**-gamma function
@@ -290,3 +309,96 @@ def fitSSRGA(A, Dmax, voxel_spacing,
 		plt.yscale('log')
 
 	return kappa, beta, gamma, zeta, alpha_eff, volume
+
+
+def _rotate_x(c, s):
+	"""
+	Rotation matrix around x axis
+	Parameters
+	----------
+	c : scalar double
+		cosine of the rotation angle
+	s : scalar double
+		sine of the rotation angle
+	Returns
+	-------
+	R : ndarray(3, 3) double
+		rotation matrix around x axis
+	"""
+	return np.array([[1, 0,  0],
+                     [0, c, -s],
+                     [0, s,  c],
+                    ])
+
+    
+def _rotate_z(c, s):
+	"""
+	Rotation matrix around z axis
+	Parameters
+	----------
+	c : scalar double
+		cosine of the rotation angle
+	s : scalar double
+		sine of the rotation angle
+	Returns
+	-------
+	R : ndarray(3, 3) double
+		rotation matrix around z axis
+	"""
+	return np.array([[c, -s, 0],
+                     [s,  c, 0],
+                     [0,  0, 1]
+                    ])
+
+    
+def area_function(shape, resolution, Dmax, theta=0.0, Nphi=32):
+	"""
+	Calculate unnormalized area functions along the specified sampling
+	directions.
+	
+	Parameters
+	----------
+	shape : array(Nvoxels, 3) - double
+	    voxelization of the snowflake shape. The shape is not projected onto a
+	    regular grid (DDA shapefile). The voxels are spaced by the resolution
+	resolution : scalar - double        
+	    the resolution of the regular grid
+	Dmax : scalar - double
+	    3D maximum size of the particle. Dmax/resolution serve the only scope
+	    of constraining the size of the area function
+	theta : array-like or scalar
+	    distribution of polar angle along which the area function is derived.
+	    If scalar value the polar angle is considered to be fixed.
+	Nphi : scalar - integer
+	    maximum number of subdivisions of the azimuth angle (i.e. around 
+	    theta=0.5pi). This maximum number of subdivisions is scaled by
+	    sin(theta) to account for the pole singularity
+	
+	Returns
+	-------
+	area_func : (Nsamples, Nbins) - integer
+	    vector of area functions along the Nsamples direction samples.
+	"""
+
+	theta = np.asarray([theta]) if np.isscalar(theta) else np.asarray(theta)
+	stheta = np.sin(theta)
+	ctheta = np.cos(theta)
+	Nalpha = [np.round(Nphi*np.abs(sbeta)).astype(int)+1 for sbeta in stheta]
+	# account for rounding errors +2 
+	area_func = np.zeros((int(np.sum(Nalpha)), int(Dmax/resolution+2)))
+	i = 0
+	for cbeta, sbeta, Na in zip(ctheta, stheta, Nalpha):
+	    Rx = _rotate_x(cbeta, sbeta)
+	    phi = np.linspace(0.0, np.pi, Na)
+	    cphi = np.cos(phi)
+	    sphi = np.sin(phi)
+	    for calpha, salpha in zip(cphi, sphi):
+	        Rz = _rotate_z(calpha, salpha)
+	        # Rotate and then rounding
+	        shp = np.round(shape.dot(Rz).dot(Rx)/resolution).astype(np.int64)
+	        # just count the number of occupied voxels per z coordinate
+	        z_sorted, z_counts = np.unique(shp[:, 2], return_counts=True)
+	        area_func[i, :len(z_counts)] = z_counts
+	        i += 1
+	        
+	return area_func	
