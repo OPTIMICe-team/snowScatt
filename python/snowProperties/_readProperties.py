@@ -56,11 +56,11 @@ def _interpolate_coeff(D, table, ar_mono=1.0):
 
 ## Library of average parameters
 snowLib = {}
-libKeys = ['kappa', 'beta', 'gamma', 'zeta1', 'aspect', 'ar_mono', 'am', 'bm', 'av', 'bv', 'aa', 'ba', 'msg']
+libKeys = ['kappa', 'beta', 'gamma', 'zeta1', 'aspect', 'ar_mono', 'am', 'bm', 'aa', 'ba', 'msg']
 
 # Mean parameters from Heymsfield Westbrook 2014 aggregates of bullet rosettes
 HW14 = {'kappa': 0.19, 'beta': 0.23, 'gamma': 5./3., 'zeta1': 1.,
-        'aspect': 0.6, 'am':0.015, 'bm':2.08, 'av':3.581, 'bv':0.3, 'aa':np.nan, 'ba':np.nan,
+        'aspect': 0.6, 'am':0.015, 'bm':2.08, 'aa':np.nan, 'ba':np.nan,
         'ar_mono': 1.0, # Could it be that I have to consider ar of bullets not rosettes?
         'msg': 'Heymsfield and Westbrook 2014 aggregates of bullett rosettes'}
 snowLib['HW14'] = HW14
@@ -68,7 +68,7 @@ snowLib['HW14'] = HW14
 # Mean parameters derived for Leinonen-Szyrmer 2015 unrimed snow aggregates
 L15_0 = {'kappa': 0.189177, 'beta': 3.06939,
          'gamma': 2.53192, 'zeta1': 0.0709529,
-         'aspect': 0.6, 'am':0.015, 'bm':2.08, 'av':3.581, 'bv':0.3, 'aa':np.nan, 'ba':np.nan,
+         'aspect': 0.6, 'am':0.015, 'bm':2.08, 'aa':np.nan, 'ba':np.nan,
          'ar_mono': 0.3,
          'msg': 'Leinonen 2015 unrimed aggregates of dendrites'}
 snowLib['LS15A0.0'] = L15_0
@@ -76,7 +76,7 @@ snowLib['LS15A0.0'] = L15_0
 # Mean parameters for Ori et al. 2014 unrimed assemblages of ice columns
 Oea14 = {'kappa': 0.190031, 'beta': 0.030681461,
          'gamma': 1.3002167, 'zeta1': 0.29466184,
-         'aspect': 0.6, 'am':0.015, 'bm':2.08, 'av':3.581, 'bv':0.3, 'aa':np.nan, 'ba':np.nan,
+         'aspect': 0.6, 'am':0.015, 'bm':2.08, 'aa':np.nan, 'ba':np.nan,
          'ar_mono': 5.0,
          'msg':'Ori 2014 assemblages of columns'}
 snowLib['Oea14'] = Oea14
@@ -197,8 +197,8 @@ class snowProperties():
 				line = f.read().split('#')[-1].split('\n')[0]
 				am = float(line.split('am=')[-1].split(',')[0])
 				bm = float(line.split('bm=')[-1].split(',')[0])
-				av = float(line.split('av=')[-1].split(',')[0])
-				bv = float(line.split('bv=')[-1].split(',')[0])
+				#av = float(line.split('av=')[-1].split(',')[0])
+				#bv = float(line.split('bv=')[-1].split(',')[0])
 				aa = float(line.split('aa=')[-1].split(',')[0])
 				ba = float(line.split('ba=')[-1].split(',')[0])
 				ar_mono = float(line.split('monomer_alpha=')[-1].split(',')[0])
