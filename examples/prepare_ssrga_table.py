@@ -8,33 +8,24 @@ Created on Thu May 14 09:08:20 2020
 
 import numpy as np
 from glob import glob
-import gzip
+#import gzip
 import pandas as pd
 from scipy.spatial import ConvexHull
 import snowScatt.ssrga as ssrga
+from snowScatt._constants import _ice_density
+from snowScatt.fallSpeed import Boehm1992 as B92
+from snowScatt.fallSpeed import KhvorostyanovCurry2005 as KC05
+from datetime import datetime as dt
 
-rho_ice = 917.0
-rho_air = 1.287
-nu_air = 1.717696e-5/rho_air
-        
 path_to_shapefiles = '../data/simultaneous-0.0/'
 shapefiles = glob(path_to_shapefiles + '*.agg')
 
-cols = ['Dmax', 'area', 'mass', 'area_function']
+cols = ['Dmax', 'mass', 'area', 'area_function', 'resolution',
+        'vel_Bohm', 'vel_KC']
 data = pd.DataFrame(index=np.arange(len(shapefiles)), columns=cols) 
 
-
-# This assumes already the shape to be on a regular grid spaced by the
-# resolution. shape must contain integer coordinates
-# It also goes only into z direction
-# TODO: make it general, take resolution as input for generalized shapes
-# TODO: consider the possibility of having polar angle incidence !=0, for this
-# case assume also a certain number of samples in azimuth (user defined)
-def area_function(shape):
-    # I just have to count the number of occupied voxels per z coordinate
-    z_sorted, z_counts = np.unique(shape[:, 2], return_counts=True)
-    return z_counts
-
+deg = 'random'
+deg = '00'
 for i, shapefile in enumerate(shapefiles):
     # load the shapefile
     # with gzip.open(shapefile, 'r') as sf:
@@ -43,20 +34,20 @@ for i, shapefile in enumerate(shapefiles):
     
     # load the metadata, for voxel resolution and cross-checking Dmax and area
     meta = shapefile + '.gz.meta'
-    try:
-        attributes=eval(open(meta).read())
-        d=attributes['grid_res']
-        dmax_att=attributes['max_diam']
-        meta = True
-    except:
-        d = 40.0e-6 # if I do not have metadata I am just assuming it is 40um
-        meta = False
+#    try:
+#        attributes=eval(open(meta).read())
+#        d=attributes['grid_res']
+#        dmax_att=attributes['max_diam']
+#        meta = True
+#    except:
+    d = 40.0e-6 # if I do not have metadata I am just assuming it is 40um
+#        meta = False
     
     # Calculates Dmax myself
     try:
         hull3d=ConvexHull(shape)
         hull3d=hull3d.points[hull3d.vertices]
-    except:
+    except: # if it is too small it fails, but it is also useless
         hull3d=shape
     dmax = 0
     for pi in range(0, hull3d.shape[0]-1):
@@ -68,22 +59,24 @@ for i, shapefile in enumerate(shapefiles):
             if dist > dmax:
                 dmax = dist
     dmax = d*dmax**0.5
-    if not meta:
-        dmax_att = dmax
+#    if not meta:
+#        dmax_att = dmax
     
     # Calculates projected area, along z axis
     xy = (0, 1) # drop z coordinate
     projection=pd.DataFrame(shape[:, xy]).drop_duplicates().values
     area = projection.shape[0]*d**2
-    mass = shape.shape[0]*d**3*rho_ice
-    
+    mass = shape.shape[0]*d**3*_ice_density
+    vel_B92 = B92(dmax, mass, area) # perhaps aspect ratio?
+    vel_KC = KC05(dmax, mass, area)
     # Calculate area function, along z axis
-    area_func = area_function(shape)
+    area_func = ssrga.area_function(shape*d, d, dmax, theta=np.pi*float(deg)/180.0)
+    #area_func = ssrga.area_function(shape*d, d, dmax, theta=np.pi*np.array([0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0])/180.0)
     
     # Put data in a DataFrame
-    data.loc[i] = [dmax, mass, area, area_func]
-
-# Create bins for SSRGA
+    data.loc[i] = [dmax, mass, area, area_func, d, vel_B92, vel_KC]
+data.to_hdf('area_functions_'+deg+'.h5', key='area')
+#%% Create bins for SSRGA
 minBin = 2.0e-3
 maxBin = 23.0e-3
 resBin = 1.0e-3
@@ -96,22 +89,48 @@ def reduction(x):
     d['Dmax'] = np.median(x['Dmax'])
     d['area'] = np.median(x['area'])
     d['mass'] = np.median(x['mass'])
-    max_len = np.max([len(y) for y in x['area_function']])
-    area_func = np.zeros((len(x['area_function']),max_len))
+    d['vel_Bohm'] = np.median(x['vel_Bohm'])
+    d['vel_KC'] = np.median(x['vel_KC'])
+    max_len = np.max([y.shape[1] for y in x['area_function']])
+    Nparticles = len(x)
+    Nsamples = x['area_function'].iloc[0].shape[0] # assume same number of samples
+    area_func = np.zeros((Nparticles*Nsamples, max_len))
     for iy, y in enumerate(x['area_function']):
-        area_func[iy, :len(y)] = y
-    #d['area_function'] = area_func
+        area_func[iy*Nsamples:iy*Nsamples+y.shape[0], :y.shape[1]] = y
     res = ssrga.fitSSRGA(area_func,
                          x['Dmax'].values,
-                         np.ones(len(x['Dmax']))*40.0e-6,
-                         max_index_largescale=12, do_plots=True)
+                         x['resolution'].values,
+                         max_index_largescale=12, do_plots=False)
     kappa, beta, gamma, zeta, alpha_eff, volume = res
     d['kappa'] = kappa
     d['gamma'] = gamma
     d['beta'] = beta
     d['zeta'] = zeta
     d['alpha_eff'] = alpha_eff
-    d['volume'] = volume
+    #d['volume'] = volume
     return pd.Series(d, index=d.keys())
 
+bv, av = np.polyfit(x=np.log10(data['Dmax'].values.astype(np.float)),
+                    y=np.log10(data['vel_Bohm'].values.astype(np.float)),
+		           deg=1)
+av = 10.0**(av)
+bm, am = np.polyfit(x=np.log10(data['Dmax'].values.astype(np.float)),
+                    y=np.log10(data['mass'].values.astype(np.float)),
+		           deg=1)
+am = 10.0**(am)
+ba, aa = np.polyfit(x=np.log10(data['Dmax'].values.astype(np.float)),
+                    y=np.log10(data['area'].values.astype(np.float)),
+		           deg=1)
+aa = 10.0**(aa)
+
 reducted = groups.apply(reduction)
+reducted.to_hdf('ssrga_'+deg+'.h5', key='area')
+reducted['Diam_max'] = reducted.index.mid
+reducted.set_index('Diam_max', inplace=True)
+reducted=reducted.astype(np.float64)
+avgstr = 'am={},bm={},av={},bv={},aa={},ba={},'.format(am,bm,av,bv,aa,ba)
+with open('table.csv', 'w') as csv:
+    csv.write('# Example data file \n')
+    csv.write('# created {} \n'.format(dt.now().strftime('%Y-%m-%d %H:%M:%S')))
+    csv.write('# '+avgstr+'monomer_alpha={},\n'.format(0.3))
+reducted.to_csv('table.csv', mode='a', float_format='%7.6e')

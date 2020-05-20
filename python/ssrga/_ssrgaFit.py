@@ -24,6 +24,7 @@ from scipy.interpolate import interp1d
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 def _calc_mean_shape(k, x):
 	"""
 	Calculates the mean, normalized area-function.
@@ -48,6 +49,7 @@ def _calc_mean_shape(k, x):
 	shape = (1.0+k/3.0)*np.cos(np.pi*x) + k*np.cos(3.0*np.pi*x)
 
 	return shape
+
 
 def _calc_kappa_lut(N=200, min_kappa=-0.15, max_kappa=0.40):
 	"""
@@ -123,6 +125,7 @@ nX = 1024 # TODO make it configurable
 X = np.linspace(-1, 1, nX)
 index = np.abs(X) <= 0.5
 Xfit = X[index]
+
 
 def _normalize_area_functions(A):
 	"""
