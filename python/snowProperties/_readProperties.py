@@ -20,6 +20,7 @@ University of Cologne
 
 """
 
+import logging
 import pandas as pd
 import numpy as np
 from os import path
@@ -175,12 +176,12 @@ class snowProperties():
 	def __init__(self):
 		self._library = snowLib
 		self._fileList = snowList
-		print('Initialize a library of snow properties')
+		logging.info('Initialize a library of snow properties')
 
 	def __call__(self, diameters, identifier, velocity_model='Boehm92'):
-		#print('return the snow properties for selected sizes')
+		logging.debug('return the snow properties for selected sizes')
 		if identifier in self._library.keys():
-			#print('got AVG ', identifier, self._library[identifier])
+			logging.debug('got AVG ', identifier, self._library[identifier])
 			kappa = np.ones_like(diameters)*self._library[identifier]['kappa']
 			beta = np.ones_like(diameters)*self._library[identifier]['beta']
 			gamma = np.ones_like(diameters)*self._library[identifier]['gamma']
@@ -192,7 +193,7 @@ class snowProperties():
 			area = self._library[identifier]['aa']*diameters**self._library[identifier]['ba']
 
 		elif identifier in self._fileList.keys():
-			#print('got TABLE ', identifier, self._fileList[identifier])
+			logging.debug('got TABLE ', identifier, self._fileList[identifier])
 			with open(self._fileList[identifier]['path']) as f:
 				line = f.read().split('#')[-1].split('\n')[0]
 				am = float(line.split('am=')[-1].split(',')[0])
@@ -224,10 +225,10 @@ class snowProperties():
 
 	def add_snow(self, label, newSnowDict):
 		if all (key in newSnowDict for key in (libKeys)):
-			print('temporary add to the internal database a new AVERAGE property')
+			logging.info('temporary add to the internal database a new AVERAGE property')
 			self._library[label] = newSnowDict
 		elif all (key in newSnowDict for key in (fileKeys)):
-			print('temporary add to the internal database a new TABLE property')
+			logging.info('temporary add to the internal database a new TABLE property')
 			self._fileList[label] = newSnowDict
 		else:
 			raise AttributeError('I do not recognize the newSnowDict attribute.\n You have to either pass a new dictionary of average properties (keys: {}) or a dictionary for a table file (keys: {}).\n'.format(libKeys, fileKeys))
