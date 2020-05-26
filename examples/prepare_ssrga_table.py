@@ -6,6 +6,9 @@ Created on Thu May 14 09:08:20 2020
 @author: dori
 """
 
+import logging
+logging.basicConfig(level=logging.INFO)
+
 import numpy as np
 from glob import glob
 #import gzip
@@ -17,6 +20,7 @@ from snowScatt.fallSpeed import Boehm1992 as B92
 from snowScatt.fallSpeed import KhvorostyanovCurry2005 as KC05
 from datetime import datetime as dt
 
+
 path_to_shapefiles = '../data/simultaneous-0.0/'
 shapefiles = glob(path_to_shapefiles + '*.agg')
 
@@ -27,21 +31,8 @@ data = pd.DataFrame(index=np.arange(len(shapefiles)), columns=cols)
 deg = 'random'
 deg = '00'
 for i, shapefile in enumerate(shapefiles):
-    # load the shapefile
-    # with gzip.open(shapefile, 'r') as sf:
-        #shape = np.loadtxt(sf)
     shape = np.loadtxt(shapefile)
-    
-    # load the metadata, for voxel resolution and cross-checking Dmax and area
-    meta = shapefile + '.gz.meta'
-#    try:
-#        attributes=eval(open(meta).read())
-#        d=attributes['grid_res']
-#        dmax_att=attributes['max_diam']
-#        meta = True
-#    except:
     d = 40.0e-6 # if I do not have metadata I am just assuming it is 40um
-#        meta = False
     
     # Calculates Dmax myself
     try:
@@ -59,8 +50,6 @@ for i, shapefile in enumerate(shapefiles):
             if dist > dmax:
                 dmax = dist
     dmax = d*dmax**0.5
-#    if not meta:
-#        dmax_att = dmax
     
     # Calculates projected area, along z axis
     xy = (0, 1) # drop z coordinate
@@ -76,6 +65,7 @@ for i, shapefile in enumerate(shapefiles):
     # Put data in a DataFrame
     data.loc[i] = [dmax, mass, area, area_func, d, vel_B92, vel_KC]
 data.to_hdf('area_functions_'+deg+'.h5', key='area')
+
 #%% Create bins for SSRGA
 minBin = 2.0e-3
 maxBin = 23.0e-3
@@ -84,6 +74,8 @@ bin_edges = np.arange(minBin-resBin*0.5, maxBin+resBin, resBin)
 bin_center = np.arange(minBin, maxBin+resBin*0.5, resBin)
 bins = pd.cut(data['Dmax'], bin_edges)
 groups = data.groupby(bins)
+
+# Define function that computes table data for each bin
 def reduction(x):
     d = {}
     d['Dmax'] = np.median(x['Dmax'])
@@ -107,9 +99,9 @@ def reduction(x):
     d['beta'] = beta
     d['zeta'] = zeta
     d['alpha_eff'] = alpha_eff
-    #d['volume'] = volume
     return pd.Series(d, index=d.keys())
 
+# Make simple power-Law fits for mass, area and velocity
 bv, av = np.polyfit(x=np.log10(data['Dmax'].values.astype(np.float)),
                     y=np.log10(data['vel_Bohm'].values.astype(np.float)),
 		           deg=1)
@@ -123,12 +115,13 @@ ba, aa = np.polyfit(x=np.log10(data['Dmax'].values.astype(np.float)),
 		           deg=1)
 aa = 10.0**(aa)
 
+# Apply reduction to the groups and write the table
 reducted = groups.apply(reduction)
 reducted.to_hdf('ssrga_'+deg+'.h5', key='area')
 reducted['Diam_max'] = reducted.index.mid
 reducted.set_index('Diam_max', inplace=True)
 reducted=reducted.astype(np.float64)
-avgstr = 'am={},bm={},av={},bv={},aa={},ba={},'.format(am,bm,av,bv,aa,ba)
+avgstr = 'am={},bm={},av={},bv={},aa={},ba={},'.format(am, bm, av, bv, aa, ba)
 with open('table.csv', 'w') as csv:
     csv.write('# Example data file \n')
     csv.write('# created {} \n'.format(dt.now().strftime('%Y-%m-%d %H:%M:%S')))
