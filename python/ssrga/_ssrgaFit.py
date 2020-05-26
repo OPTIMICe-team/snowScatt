@@ -23,6 +23,7 @@ from scipy.fftpack import fft
 from scipy.interpolate import interp1d
 import numpy as np
 import matplotlib.pyplot as plt
+import logging
 
 
 def _calc_mean_shape(k, x):
@@ -285,7 +286,7 @@ def fitSSRGA(A, Dmax, voxel_spacing,
 	index_largescale = np.arange(1, max_index_largescale, 1)
 	#variance_largescale = (np.sum(power_spectrum[index_largescale])).real
 	
-	#print('PARSEVAL', np.sum(power_spectrum)/np.var(Adiff[:]))
+	logging.info('PARSEVAL {}'.format(np.sum(power_spectrum)/np.var(Adiff[:])))
 
 	j = np.arange(1, nXfit//2+1) # All the meaningful wavenumbers, start from 1
 	# Fit the P = beta*(2j)**-gamma function
