@@ -31,11 +31,11 @@ from Cython.Build import cythonize
 def configuration(parent_package='',top_path=None):
     from numpy.distutils.misc_util import Configuration
     config = Configuration('snowScatt', parent_package, top_path,
-        version = '0.1.0-alpha',
+        version = '0.1.2-alpha',
         author  = "Davide Ori",
         author_email = "davide.ori87@gmail.com",
         description = "SSRGA scattering computation and snow properties",
-        license = "MIT",
+        license = "GPL",
         url = 'https://github.com/DaveOri/snowScatt.git',
         download_url = \
             'https://github.com/DaveOri/snowScatt.git',

@@ -181,7 +181,7 @@ class snowProperties():
 	def __call__(self, diameters, identifier, velocity_model='Boehm92'):
 		logging.debug('return the snow properties for selected sizes')
 		if identifier in self._library.keys():
-			logging.debug('got AVG ', identifier, self._library[identifier])
+			logging.debug('got AVG '+identifier+str(self._library[identifier]))
 			kappa = np.ones_like(diameters)*self._library[identifier]['kappa']
 			beta = np.ones_like(diameters)*self._library[identifier]['beta']
 			gamma = np.ones_like(diameters)*self._library[identifier]['gamma']
@@ -193,7 +193,7 @@ class snowProperties():
 			area = self._library[identifier]['aa']*diameters**self._library[identifier]['ba']
 
 		elif identifier in self._fileList.keys():
-			logging.debug('got TABLE ', identifier, self._fileList[identifier])
+			logging.debug('got TABLE '+identifier+str(self._fileList[identifier]))
 			with open(self._fileList[identifier]['path']) as f:
 				line = f.read().split('#')[-1].split('\n')[0]
 				am = float(line.split('am=')[-1].split(',')[0])

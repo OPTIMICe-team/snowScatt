@@ -181,7 +181,7 @@ class GammaPSD(PSD):
 
 
 class BinnedPSD(PSD):
-    """Binned gamma particle size distribution (PSD).
+    """Binned particle size distribution (PSD).
     
     Callable class to provide a binned PSD with the given bin edges and PSD
     values.

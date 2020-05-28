@@ -20,6 +20,7 @@ University of Cologne
 """
 
 import numpy as np
+import logging
 
 from snowScatt.ssrgalib import ssrga
 from snowScatt.ssrgalib import ssrgaBack
@@ -66,19 +67,17 @@ def _prepare_input(diameters, wavelength, properties, ref_index, temperature,
     if ref_index is None:
         if temperature is None:
             raise AttributeError('You have to either specify directly the refractive index or provide the temperature so that refractive index will be calculated according to Iwabuchi 2011 model\n')
-        print('computing refractive index of ice ...')
+        logging.debug('computing refractive index of ice ...')
         temperature = temperature*np.ones_like(diameters)
-        #print(temperature.shape, (_c/wavelength).shape)
         ref_index = ice.n(temperature, _c/wavelength,
                           matzlerCheckTemperature=True)
     else:
         ref_index = ref_index*np.ones_like(diameters)
-        #print(type(ref_index), ref_index.shape, ref_index)
 
     kappa, beta, gamma, zeta1, alpha_eff, ar_mono, mass_prop, vel, area = snowLibrary(diameters, properties)
     
     if mass is None:
-        print('compute masses from snow properties')
+        logging.debug('compute masses from snow properties')
         mass = mass_prop
     else:
         mass = mass*np.ones_like(diameters)
