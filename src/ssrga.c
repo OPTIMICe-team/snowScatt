@@ -1,6 +1,13 @@
 /*
+This code is based on ssrga.c available at http://www.met.reading.ac.uk/clouds/ssrga/
+Author: Robin Hogan <r.j.hogan@ecmwf.int>
+Copyright (C) 2016  European Centre for Medium Range Weather Forecasts 
+Language: C99
+
+Modifications made to improve accessibility from external modules  
 Copyright (C) 2020 Davide Ori 
 University of Cologne
+
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -86,7 +93,7 @@ void ssrga_single(double Deff, double Vol, double wl, double complex K,
     for (i_theta=Ntheta-1; i_theta>=0; i_theta--) {
         double theta = i_theta*dTheta;
         double cos_th = cos(theta);
-        double x_eff = x*sin(0.5*theta);//(1.0-cos_th)*0.5;//
+        double x_eff = x*sin(0.5*theta);
         phase[i_theta] = mean_term(x_eff, kappa) + 
                          sum_term(x_eff, beta, gamma, zeta1);
         phase[i_theta] *= (1.0+cos_th*cos_th)*0.5;

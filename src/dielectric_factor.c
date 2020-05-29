@@ -1,4 +1,10 @@
 /*
+This code is based on ssrga.c available at http://www.met.reading.ac.uk/clouds/ssrga/
+Author: Robin Hogan <r.j.hogan@ecmwf.int>
+Copyright (C) 2016  European Centre for Medium Range Weather Forecasts 
+Language: C99
+
+Minor modifications to the original code
 Copyright (C) 2020 Davide Ori 
 University of Cologne
 
