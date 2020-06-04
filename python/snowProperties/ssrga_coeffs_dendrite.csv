@@ -1,7 +1,7 @@
 # Table of coefficients for aggregates of dendrite generated with the aggregation code of Jussi Leinonen available at https://github.com/jleinonen/aggregation 
 # author: Leonie von Terzi, email:lterzi@uni-koeln.de
 # Particles generated with an inverse exponential PSD of monomers, size parameters varying from 50e-6 to 9.32e-3m,min_size:100e-6m,max_size:3000e-6,grid_res:1e-5,the following velocity fits were calculated with a power law from Boehm relation
-# am=0.00998766,bm=2.00128076,av=2.50741364,bv=0.27052854,aa=0.05768,ba=1.81618770,monomer_alpha=0.049,
+# am=0.02522677,bm=2.19978322,av=5.97000795,bv=0.45396479,aa=0.07986,ba=1.87763648,monomer_alpha=0.049
 Diam_max,mass,area,vel_Bohm,vel_KC,beta,gamma,kappa,zeta,alpha_eff
 8.750000e-04,5.385322e-09,1.583482e-07,2.407150e-01,4.460388e-01,6.804340e+00,3.130892e+00,2.753755e-01,2.498711e-02,8.189700e-01
 1.375000e-03,1.305388e-08,3.489260e-07,3.069787e-01,5.452528e-01,5.873871e+00,2.905145e+00,2.492404e-01,2.701566e-02,7.962841e-01

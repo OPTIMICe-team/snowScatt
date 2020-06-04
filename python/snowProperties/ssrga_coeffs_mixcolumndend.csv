@@ -1,7 +1,7 @@
 # Table of coefficients for aggregates of mixcolumndend generated with the aggregation code of Jussi Leinonen available at https://github.com/jleinonen/aggregation 
 # author: Leonie von Terzi, email:lterzi@uni-koeln.de
 # Particles generated with an inverse exponential PSD of monomers, size parameters varying from 50e-6 to 3.00e-3m,min_size:100e-6m,max_size:3000e-6,grid_res:1e-5,the following velocity fits were calculated with a power law from Boehm relation
-# am=0.03951048,bm=2.03603500,av=6.24139264,bv=0.30291349,aa=0.06888,ba=1.81350181,monomer_alpha=1.000
+# am=0.00503555,bm=1.73154525,av=1.03879349,bv=0.02305396,aa=0.07195,ba=1.82837718,monomer_alpha=1.000
 Diam_max,mass,area,vel_Bohm,vel_KC,beta,gamma,kappa,zeta,alpha_eff
 1.300000e-03,5.421465e-08,4.225114e-07,8.190014e-01,1.154082e+00,2.041890e+01,3.788788e+00,2.224615e-01,1.498767e-02,7.991834e-01
 1.800000e-03,9.436682e-08,6.887655e-07,8.868558e-01,1.276361e+00,2.141272e+01,3.748761e+00,2.266422e-01,1.341977e-02,7.967878e-01
