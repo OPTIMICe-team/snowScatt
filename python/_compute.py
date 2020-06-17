@@ -59,8 +59,9 @@ def _convert_to_array(x):
     return np.asarray([x]) if np.isscalar(x) else np.asarray(x)
 
 
-def _prepare_input(diameters, wavelength, properties, ref_index, temperature, 
-                   mass, theta):
+def _prepare_input(diameters, wavelength, properties,
+                   ref_index=None, temperature=None, 
+                   mass=None, theta=0.0):
     diameters = _convert_to_array(diameters)
     wavelength = wavelength*np.ones_like(diameters)
 
@@ -214,3 +215,15 @@ def backscatVel(diameters, wavelength, properties, ref_index=None,
     Deff, Vol, wavelength, K, kappa, gamma, beta, zeta1, mass_prop, vel, area = params
     
     return ssrgaBack(Deff, Vol, wavelength, K, kappa, gamma, beta, zeta1), vel
+
+
+def snowMassVelocityArea(diameters, properties):
+    """
+    Convenience function to extract directly mass, velocity and area for a
+    specific set of sizes and a particle in the database
+    """
+    
+    diameters = _convert_to_array(diameters)
+    _, _, _, _, _, _, mass, vel, area = snowLibrary(diameters, properties)
+
+    return mass, vel, area
