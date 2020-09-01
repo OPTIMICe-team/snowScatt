@@ -77,7 +77,7 @@ snowLib['LS15A0.0'] = L15_0
 # Mean parameters for Ori et al. 2014 unrimed assemblages of ice columns
 Oea14 = {'kappa': 0.190031, 'beta': 0.030681461,
          'gamma': 1.3002167, 'zeta1': 0.29466184,
-         'aspect': 0.6, 'am':0.015, 'bm':2.08, 'aa':np.nan, 'ba':np.nan,
+         'aspect': 0.9, 'am':0.157, 'bm':2.1, 'aa':np.nan, 'ba':np.nan,
          'ar_mono': 5.0,
          'msg':'Ori 2014 assemblages of columns'}
 snowLib['Oea14'] = Oea14
@@ -89,6 +89,7 @@ fileKeys = ['path', 'msg']
 L15tabA00 = {'path':module_path+'/ssrga_coeffs_simultaneous_0.0.csv',
              'msg':'Table of Leinonen unrimed snowflakes'}
 snowList['Leinonen15tabA00'] = L15tabA00
+snowList['Leinonen15tabB00'] = L15tabA00 # make a B00 entry that points to the same
 
 # Leinonen 2015 Table for rimed snowflakes ELWP=0.1 model A simultaneous
 L15tabA01 = {'path':module_path+'/ssrga_coeffs_simultaneous_0.1.csv',
@@ -170,6 +171,10 @@ LvTmixcoldend = {'path':module_path+'/ssrga_coeffs_mixcolumndend.csv',
            'msg':'Table of von Terzi assemblages of mixtures of columns and dendrites'}
 snowList['vonTerzi_mixcoldend'] = LvTmixcoldend
 
+# Davide Ori Table of unrimed aggregates obtained from a continuous collection of columnar crystals
+DOcollColumns = {'path':module_path+'/ssrga_coeffs_Ori_collection_columns.csv',
+                 'msg':'Table of Davide Ori aggregates of collection of columns'}
+snowList['Ori_collColumns'] = DOcollColumns
 
 ## Class to manage the library of snow properties
 class snowProperties():

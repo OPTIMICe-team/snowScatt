@@ -21,8 +21,8 @@ from snowScatt.fallSpeed import KhvorostyanovCurry2005 as KC05
 from datetime import datetime as dt
 
 
-path_to_shapefiles = '../data/simultaneous-0.0/'
-shapefiles = glob(path_to_shapefiles + '*.agg')
+path_to_shapefiles = '/home/dori/develop/pySAM/dat*/*.dat'#'../data/simultaneous-0.0/'
+shapefiles = glob(path_to_shapefiles)# + '*.agg')
 
 cols = ['Dmax', 'mass', 'area', 'area_function', 'resolution',
         'vel_Bohm', 'vel_KC']
@@ -31,9 +31,9 @@ data = pd.DataFrame(index=np.arange(len(shapefiles)), columns=cols)
 deg = 'random'
 deg = '00'
 for i, shapefile in enumerate(shapefiles):
-    shape = np.loadtxt(shapefile)
+    shape = np.loadtxt(shapefile)[:,0:3]
     d = 40.0e-6 # if I do not have metadata I am just assuming it is 40um
-    
+    d = 20.0e-6
     # Calculates Dmax myself
     try:
         hull3d=ConvexHull(shape)
@@ -68,7 +68,7 @@ data.to_hdf('area_functions_'+deg+'.h5', key='area')
 
 #%% Create bins for SSRGA
 minBin = 2.0e-3
-maxBin = 23.0e-3
+maxBin = 17.0e-3#23.0e-3
 resBin = 1.0e-3
 bin_edges = np.arange(minBin-resBin*0.5, maxBin+resBin, resBin)
 bin_center = np.arange(minBin, maxBin+resBin*0.5, resBin)

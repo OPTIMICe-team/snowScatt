@@ -30,8 +30,8 @@ Dmax = np.linspace(0.1e-3, 20.0e-3, 1000) # list of sizes
 lams = 1.0/np.linspace(0.01e-3, 11.0e-3, 100)
 
 rime = ['00', '01', '02', '05', '10', '20']
-particles = 'Leinonen15tabA'
-fig, (ax0, ax1) = plt.subplots(1, 2)
+particles = 'Leinonen15tabB'
+fig, (ax0) = plt.subplots(1, 1)
 # 
 PSD = np.stack([np.array(Nexp(Dmax, l)) for l in lams])
 for r in rime:
@@ -51,23 +51,56 @@ for r in rime:
     Zk = np.array([dB((1.0e18*bck.iloc[:, 1]*Nexp(Dmax, l)*np.gradient(Dmax)).sum()) for l in lams ])
     Zw = np.array([dB((1.0e18*bck.iloc[:, 2]*Nexp(Dmax, l)*np.gradient(Dmax)).sum()) for l in lams ])
     
-    ax0.plot(Zk-Zw, Zx-Zk, label=r)
+    ax0.plot(Zk-Zw, Zx-Zk, label='L-B'+r)
 
-    wl = snowScatt._compute._c/frequency[0]
-    Zx0 = Ze(Dmax, PSD, wl, particle, temperature=temperature)
-    wl = snowScatt._compute._c/frequency[1]
-    Zk0 = Ze(Dmax, PSD, wl, particle, temperature=temperature)
-    wl = snowScatt._compute._c/frequency[2]
-    Zw0 = Ze(Dmax, PSD, wl, particle, temperature=temperature)
+    # check consistency of methods OK
+    #wl = snowScatt._compute._c/frequency[0]
+    #Zx0 = Ze(Dmax, PSD, wl, particle, temperature=temperature)
+    #wl = snowScatt._compute._c/frequency[1]
+    #Zk0 = Ze(Dmax, PSD, wl, particle, temperature=temperature)
+    #wl = snowScatt._compute._c/frequency[2]
+    #Zw0 = Ze(Dmax, PSD, wl, particle, temperature=temperature)
     
-    ax1.plot(Zk0-Zw0, Zx0-Zk0, label=r)
+    #ax1.plot(Zk0-Zw0, Zx0-Zk0, label=r)
     
-    print('diffs ', (Zx-Zx0).sum(), (Zk-Zk0).sum(), (Zw-Zw0).sum())
+    #print('diffs ', (Zx-Zx0).sum(), (Zk-Zk0).sum(), (Zw-Zw0).sum())
 
-for ax in (ax0, ax1):
+particle = 'Ori_collColumns'
+bck = pd.DataFrame(index=Dmax, columns=frequency)
+for fi, freq in enumerate(frequency):
+    wl = snowScatt._compute._c/freq
+    eps = snowScatt.refractiveIndex.water.eps(temperature, freq, 'Turner')
+    K2 = snowScatt.refractiveIndex.utilities.K2(eps)
+    ssCbck, ssvel = snowScatt.backscatVel(diameters=Dmax,
+                                          wavelength=wl,
+                                          properties=particle,
+                                          temperature=temperature)
+    bck[freq] = wl**4*ssCbck/(K2*np.pi**5)
+Zx = np.array([dB((1.0e18*bck.iloc[:, 0]*Nexp(Dmax, l)*np.gradient(Dmax)).sum()) for l in lams ])
+Zk = np.array([dB((1.0e18*bck.iloc[:, 1]*Nexp(Dmax, l)*np.gradient(Dmax)).sum()) for l in lams ])
+Zw = np.array([dB((1.0e18*bck.iloc[:, 2]*Nexp(Dmax, l)*np.gradient(Dmax)).sum()) for l in lams ])
+ax0.plot(Zk-Zw, Zx-Zk, label='Ori-table', lw=4)
+
+particle = 'Oea14'
+bck = pd.DataFrame(index=Dmax, columns=frequency)
+for fi, freq in enumerate(frequency):
+    wl = snowScatt._compute._c/freq
+    eps = snowScatt.refractiveIndex.water.eps(temperature, freq, 'Turner')
+    K2 = snowScatt.refractiveIndex.utilities.K2(eps)
+    ssCbck, ssvel = snowScatt.backscatVel(diameters=Dmax,
+                                          wavelength=wl,
+                                          properties=particle,
+                                          temperature=temperature)
+    bck[freq] = wl**4*ssCbck/(K2*np.pi**5)
+Zx = np.array([dB((1.0e18*bck.iloc[:, 0]*Nexp(Dmax, l)*np.gradient(Dmax)).sum()) for l in lams ])
+Zk = np.array([dB((1.0e18*bck.iloc[:, 1]*Nexp(Dmax, l)*np.gradient(Dmax)).sum()) for l in lams ])
+Zw = np.array([dB((1.0e18*bck.iloc[:, 2]*Nexp(Dmax, l)*np.gradient(Dmax)).sum()) for l in lams ])
+ax0.plot(Zk-Zw, Zx-Zk, label='Ori-constant', lw=4)
+
+for ax in [ax0,]:
     ax.legend()
     ax.grid()
     ax.set_xlabel('Ka - W   [dB]')
     ax.set_ylabel('Ku - Ka  [dB]')
-
+fig.savefig('OriVSOri.png', dpi=300)
 print('Execution ', datetime.datetime.now()-begin)
