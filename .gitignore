@@ -3,6 +3,7 @@ data/
 examples/*.nc
 examples/*.png
 examples/*.h5
+examples/*.pdf
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
