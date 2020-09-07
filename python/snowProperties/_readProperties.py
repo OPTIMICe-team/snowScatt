@@ -63,7 +63,7 @@ libKeys = ['kappa', 'beta', 'gamma', 'zeta1', 'aspect', 'ar_mono', 'am', 'bm', '
 HW14 = {'kappa': 0.19, 'beta': 0.23, 'gamma': 5./3., 'zeta1': 1.,
         'aspect': 0.6, 'am':0.015, 'bm':2.08, 'aa':np.nan, 'ba':np.nan,
         'ar_mono': 1.0, # Could it be that I have to consider ar of bullets not rosettes?
-        'msg': 'Heymsfield and Westbrook 2014 aggregates of bullett rosettes'}
+        'msg': 'Hogan and Westbrook 2014 aggregates of bullett rosettes'}
 snowLib['HW14'] = HW14
 
 # Mean parameters derived for Leinonen-Szyrmer 2015 unrimed snow aggregates
