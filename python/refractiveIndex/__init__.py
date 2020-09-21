@@ -15,7 +15,7 @@ Example
 -------
     $ python
     >>> import refractive
-    >>> refractive.n(temperatures, frequencies, **kwargs)
+  ``>>> refractive.n(temperatures, frequencies, **kwargs)``
 
 and returns the complex refractive index of ice at the requested
 Temperature [Kelvin] and Frequency [Hz]
