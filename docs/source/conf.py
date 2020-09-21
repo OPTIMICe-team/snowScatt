@@ -19,6 +19,12 @@
 import os
 import sys
 sys.path.insert(0, os.path.abspath('../../'))
+sys.path.append('../../python/')
+sys.path.append('../../python/fallSpeed/')
+sys.path.append('../../python/instrumentSimulator/')
+sys.path.append('../../python/refractiveIndex/')
+sys.path.append('../../python/snowProperties/')
+sys.path.append('../../python/ssrga/')
 
 
 # -- General configuration ------------------------------------------------
