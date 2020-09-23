@@ -18,7 +18,7 @@ def setlabel(ax, label, loc=2, borderpad=0.6, **kwargs):
     line.remove()
 ############################################################################################
 
-shapePath = '/work/lvonterz/SSRGA/shapefiles/'
+shapePath = 'data/'#'/work/lvonterz/SSRGA/shapefiles/'
 monotypes = ['dori','leinSubs','lterzi']
 dipole_res_OriLeinonen = 40e-6
 fig,axes = plt.subplots(nrows=4,ncols=3,figsize=(14,18))
