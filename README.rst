@@ -2,6 +2,22 @@
 snowScatt
 =======
 
+
+
+-------------
+Documentation
+-------------
+http://gop.meteo.uni-koeln.de/~dori/build/html/index.html
+
+
+
+
+
+=======================
+IGNORE THIS PART
+=======================
+
+
 .. image:: https://readthedocs.org/projects/snowscatt/badge/?version=latest
 :target: https://snowscatt.readthedocs.io/en/latest/?badge=latest
 :alt: Documentation Status
