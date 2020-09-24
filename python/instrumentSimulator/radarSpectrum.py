@@ -1,23 +1,22 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""
-Copyright (C) 2020 Davide Ori 
-University of Cologne
+# Copyright (C) 2020 Davide Ori 
+# University of Cologne
 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-"""
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 
 import numpy as np
 import logging
@@ -32,46 +31,115 @@ from snowScatt import refractiveIndex
 
 
 def dopplerSpectrum(diameters, psd, wavelength, properties, 
-                    ref_index=None, temperature=None,
-                    mass=None, theta=0.0,
-                    dopplerVel=None):
-    """radar Doppler spectrum simulator
+					ref_index=None, temperature=None,
+					mass=None, theta=0.0,
+					dopplerVel=None):
+	""" radar Doppler spectrum simulator
 
-    """
-    freq = _c/wavelength
-    bck, vel = backscatVel(diameters, wavelength, properties,
-                           ref_index, temperature, mass, theta)
-    eps = refractiveIndex.water.eps(temperature, freq, 'Turner')
-    K2 = refractiveIndex.utilities.K2(eps)
-    z = specific_reflectivity(wavelength, bck, K2)
+	Simulates the Doppler spectrum of the reflectivity given the particle 
+	properties and the PSD
 
-    spectrum = z*psd*np.gradient(diameters)/np.gradient(vel)
+	Parameters
+	----------
+		diameters : array(Nparticles) - double
+			spectrum of diameters of the particles [meters]
+		psd : callable
+			size distribution of the particle 
+			concentration [meters**-1 meters**-3]
+		wavelength : scalar - double
+			electromagnetic wavelength to be passed to the snowScatt 
+			properties calculator
+		ref_index : scalar - complex (default to None)
+			complex refractive index of ice to be passed to the snowScatt 
+			properties calculator
+		temperature : scalar - double
+			absolute temperature, alternative formulation of ref_index when 
+			ref_index is None to be passed to the snowScatt properties 
+			calculator
+		mass : array(Nparticles) - double
+			mass of the snowflakes to be passed to the snowScatt properties 
+			calculator if left None the mass is derived by the snowLibrary 
+			properties
+		theta : scalar - double
+			zenith incident angle of the electromagnetic radiation, to be passed
+			to the snowScatt properties calculator
+		dopplerVel : array(Nparticles) - double
+			override spectrum of Doppler velocities
+			if left None the Doppler velocities are calculated from the particle
+			properties. 
 
-    logging.debug(dB(np.sum(z*psd*np.gradient(diameters), axis=-1))-
-                  dB(np.sum(spectrum*np.gradient(vel), axis=-1)))
+	Returns
+	-------
+		spectrum : array(Nparticles) - double
+			specific radar reflectivity size spectrum [mm**6 m**-3 (m/s)**-1]
 
-    if dopplerVel is None:
-        dopplerVel = np.linspace(-10.0, 10.0, 1024)
+	"""
+	freq = _c/wavelength
+	bck, vel = backscatVel(diameters, wavelength, properties,
+						   ref_index, temperature, mass, theta)
+	eps = refractiveIndex.water.eps(temperature, freq, 'Turner')
+	K2 = refractiveIndex.utilities.K2(eps)
+	z = specific_reflectivity(wavelength, bck, K2)
 
-    velidx = vel.argsort()
+	spectrum = z*psd*np.gradient(diameters)/np.gradient(vel)
 
-    dopplerVel = vel[velidx]
-    return spectrum[: ,velidx], dopplerVel
+	logging.debug(dB(np.sum(z*psd*np.gradient(diameters), axis=-1))-
+				  dB(np.sum(spectrum*np.gradient(vel), axis=-1)))
+
+	if dopplerVel is None:
+		dopplerVel = np.linspace(-10.0, 10.0, 1024)
+
+	velidx = vel.argsort()
+
+	dopplerVel = vel[velidx]
+	return spectrum[: ,velidx], dopplerVel
 
 
 def sizeSpectrum(diameters, psd, wavelength, properties, 
-                    ref_index=None, temperature=None,
-                    mass=None, theta=0.0):
-    """radar spectrum simulator
+					ref_index=None, temperature=None,
+					mass=None, theta=0.0):
+	""" radar spectrum simulator
+	Simulates the size spectrum of the reflectivity given the particle 
+	properties and the PSD
 
-    """
-    freq = _c/wavelength
-    bck = backscatter(diameters, wavelength, properties,
-                      ref_index, temperature, mass, theta)
-    eps = refractiveIndex.water.eps(temperature, freq, 'Turner')
-    K2 = refractiveIndex.utilities.K2(eps)
-    z = specific_reflectivity(wavelength, bck, K2)
+	Parameters
+	----------
+		diameters : array(Nparticles) - double
+			spectrum of diameters of the particles [meters]
+		psd : callable
+			size distribution of the particle 
+			concentration [meters**-1 meters**-3]
+		wavelength : scalar - double
+			electromagnetic wavelength to be passed to the snowScatt 
+			properties calculator
+		ref_index : scalar - complex (default to None)
+			complex refractive index of ice to be passed to the snowScatt 
+			properties calculator
+		temperature : scalar - double
+			absolute temperature, alternative formulation of ref_index when 
+			ref_index is None to be passed to the snowScatt properties 
+			calculator
+		mass : array(Nparticles) - double
+			mass of the snowflakes to be passed to the snowScatt properties 
+			calculator if left None the mass is derived by the snowLibrary 
+			properties
+		theta : scalar - double
+			zenith incident angle of the electromagnetic radiation, to be passed
+			to the snowScatt properties calculator
 
-    spectrum = z*psd
+	Returns
+	-------
+		spectrum : array(Nparticles) - double
+			specific radar reflectivity size spectrum [mm**6 m**-3 m**-1]
 
-    return spectrum
+	"""
+	freq = _c/wavelength
+	bck = backscatter(diameters, wavelength, properties,
+					  ref_index, temperature, mass, theta)
+	eps = refractiveIndex.water.eps(temperature, freq, 'Turner')
+	K2 = refractiveIndex.utilities.K2(eps)
+	z = specific_reflectivity(wavelength, bck, K2)
+
+	spectrum = z*psd
+
+	return spectrum

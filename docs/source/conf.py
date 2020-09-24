@@ -103,7 +103,7 @@ html_theme = 'alabaster'
 # further.  For a list of options available for each theme, see the
 # documentation.
 #
-# html_theme_options = {}
+html_theme_options = {'extra_nav_links':{'Home':'index.html'}}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -117,6 +117,9 @@ html_static_path = ['nstatic']
 # refs: http://alabaster.readthedocs.io/en/latest/installation.html#sidebars
 html_sidebars = {
     '**': [
+        #'globaltoc.html',
+        'navigation.html',
+        'sourcelink.html',
         'relations.html',  # needs 'show_related': True theme option to display
         'searchbox.html',
     ]

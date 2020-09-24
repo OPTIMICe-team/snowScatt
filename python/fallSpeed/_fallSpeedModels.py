@@ -1,23 +1,22 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""
-Copyright (C) 2020 Davide Ori 
-University of Cologne
+#Copyright (C) 2020 Davide Ori 
+#University of Cologne
 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-"""
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 
 import numpy as np
 from snowScatt._constants import _g as g
@@ -60,30 +59,31 @@ def correctionFooteduToit(vel, rho_air, temperature, rho0=_rho0, T0=293.15):
 
 
 def Boehm1992(diam, mass, area,
-	          rho_air=_rho0, nu_air=_nu0, as_ratio=1.0):
+			  rho_air=_rho0, nu_air=_nu0, as_ratio=1.0):
 	"""
-	TODO PUT SOME REFERENCE HERE
+	Bohm, J.(1992).A general hydrodynamic theory for mixed-phase microphysics.
+	Part I: Drag and fall speed of hydrometeors.Atmospheric research,27(4), 253–274
 
-    Parameters:
-    -----------
-    diam : array(Nparticles) double
-    	spectrum of diameters of the particles [meters]
-    rho_air : scalar double
-    	air density [kilograms/meter**3]
-    nu_air : scalar double
-    	air kinematic viscosity [meters**2/seconds]
-    mass : array(Nparticles) double
-    	mass of the particles [kilograms]
-    area : array(Nparticles) double
-    	cross section area [meters**2]
-    as_ratio : scalar double
-    	Correction factor for the calculation of area ration in non-spherical
-    	symmetric particles. See Karrer et al. 2020
+	Parameters
+	----------
+	diam : array(Nparticles) double
+		spectrum of diameters of the particles [meters]
+	rho_air : scalar double
+		air density [kilograms/meter**3]
+	nu_air : scalar double
+		air kinematic viscosity [meters**2/seconds]
+	mass : array(Nparticles) double
+		mass of the particles [kilograms]
+	area : array(Nparticles) double
+		cross section area [meters**2]
+	as_ratio : scalar double
+		Correction factor for the calculation of area ration in non-spherical
+		symmetric particles. See Karrer et al. 2020
 
-    Returns:
-    --------
-    vterm_bohm : array(Nparticles) double
-    	terminal fallspeed computed according to the model [meters/second]
+	Returns
+	-------
+	vterm_bohm : array(Nparticles) double
+		terminal fallspeed computed according to the model [meters/second]
 	"""
 
 	q = area / (np.pi/4.0 * diam**2)
@@ -94,10 +94,10 @@ def Boehm1992(diam, mass, area,
 	#X = 8.0*mass*grav*rho_air/(np.pi*(eta_air**2)*q**0.25)
 	X = 8.0*mass*g*rho_air/(np.pi*(eta_air**2)*np.maximum(alpha,np.ones_like(alpha)*1.0)*np.maximum(q**0.25,q)) #reduced to 8.0*mtot*grav*rho/(np.pi*(eta**2)*q**(1/4) = 8.0*mtot*grav*rho/(np.pi*(eta**2)*(area / (np.pi/4.0 * diam**2))**(1/4) for alpha=1 and q<1 (which is usually the case)
 	k = 1.0 #np.minimum(np.maximum(0.82+0.18*alpha,
-	        #                  np.ones_like(alpha)*0.85),
-	        #       0.37+0.63/alpha,
-	        #       1.33/(np.maximum(np.log(alpha),
-	        #                        np.ones_like(alpha)*0.0)+1.19)) #k is 1 for alpha=1
+			#                  np.ones_like(alpha)*0.85),
+			#       0.37+0.63/alpha,
+			#       1.33/(np.maximum(np.log(alpha),
+			#                        np.ones_like(alpha)*0.0)+1.19)) #k is 1 for alpha=1
 	gama_big = np.maximum(np.ones_like(alpha)*1.0, np.minimum(np.ones_like(alpha)*1.98,3.76-8.41*alpha+9.18*alpha**2-3.53*alpha**3)) #1 for alpha=1
 	C_DP = np.maximum(0.292*k*gama_big,0.492-0.2/np.sqrt(alpha)) #0.292 for alpha=1
 	C_DP = np.maximum(1.0,q*(1.46*q-0.46))*C_DP #0.292 for alpha=1
@@ -113,27 +113,28 @@ def Boehm1992(diam, mass, area,
 
 
 def Boehm1989(diam, mass, area,
-	          rho_air=_rho0, nu_air=_nu0):
+			  rho_air=_rho0, nu_air=_nu0):
 	"""
-	TODO PUT SOME REFERENCE HERE
+	Böhm, J.  (1989).A general equation for the terminal fall speed of solid hydrometeors (Vol. 46) (No. 15).
+	doi:  10.1175/1520-0469(1989)046〈2419:AGEFTT〉2.0.CO;2915B 
+	
+	Parameters
+	----------
+	diam : array(Nparticles) double
+		spectrum of diameters of the particles [meters]
+	rho_air : scalar double
+		air density [kilograms/meter**3]
+	nu_air : scalar double
+		air kinematic viscosity [meters**2/seconds]
+	mass : array(Nparticles) double
+		mass of the particles [kilograms]
+	area : array(Nparticles) double
+		cross section area [meters**2]
 
-    Parameters:
-    -----------
-    diam : array(Nparticles) double
-    	spectrum of diameters of the particles [meters]
-    rho_air : scalar double
-    	air density [kilograms/meter**3]
-    nu_air : scalar double
-    	air kinematic viscosity [meters**2/seconds]
-    mass : array(Nparticles) double
-    	mass of the particles [kilograms]
-    area : array(Nparticles) double
-    	cross section area [meters**2]
-
-    Returns:
-    --------
-    vterm_bohm : array(Nparticles) double
-    	terminal fallspeed computed according to the model [meters/second]
+	Returns
+	-------
+	vterm_bohm : array(Nparticles) double
+		terminal fallspeed computed according to the model [meters/second]
 	"""
 
 	q = area / (np.pi/4.0 * diam**2)
@@ -159,37 +160,38 @@ def Boehm1989(diam, mass, area,
 
 
 def HeymsfieldWestbrook2010(diaSpec, mass, area,
-	                        rho_air=_rho0, nu_air=_nu0, k=0.5):
+							rho_air=_rho0, nu_air=_nu0, k=0.5):
 	"""
 	Heymsfield, A. J. & Westbrook, C. D. Advances in the Estimation of Ice Particle Fall Speeds
-    Using Laboratory and Field Measurements. Journal of the Atmospheric Sciences 67, 2469–2482 (2010).
-    equations 9-11
+	Using Laboratory and Field Measurements. Journal of the Atmospheric Sciences 67, 2469-2482 (2010).
+	equations 9-11
 
-    Parameters:
-    -----------
-    diaSpec : array(Nparticles) double
-    	spectrum of diameters of the particles [meters]
-    rho_air : scalar double
-    	air density [kilograms/meter**3]
-    nu_air : scalar double
-    	air kinematic viscosity [meters**2/seconds]
-    mass : array(Nparticles) double
-    	mass of the particles [kilograms]
-    area : array(Nparticles) double
-    	cross section area [meters**2]
-    k : scalar double
-    	tuning coefficient for turbulent flow defaults to 0.5
+	Parameters
+	----------
+	diaSpec : array(Nparticles) double
+		spectrum of diameters of the particles [meters]
+	rho_air : scalar double
+		air density [kilograms/meter**3]
+	nu_air : scalar double
+		air kinematic viscosity [meters**2/seconds]
+	mass : array(Nparticles) double
+		mass of the particles [kilograms]
+	area : array(Nparticles) double
+		cross section area [meters**2]
+	k : scalar double
+		tuning coefficient for turbulent flow defaults to 0.5
 
-    Returns:
-    --------
-    velSpec : array(Nparticles) double
-    	terminal fallspeed computed according to the model [meters/second]
+	Returns
+	-------
+	velSpec : array(Nparticles) double
+		terminal fallspeed computed according to the model [meters/second]
 	"""
+
 	delta_0 = 8.0
 	C_0 = 0.35
 	
 	area_proj = area/((np.pi/4.)*diaSpec**2) # area ratio
-	eta = nu_air * rho_air #!now dynamic viscosity
+	eta = nu_air * rho_air #now dynamic viscosity
 
 	Xstar = 8.0*rho_air*mass*g/(np.pi*area_proj**(1.0-k)*eta**2)# !eq 9
 	Re=0.25*delta_0**2*((1.0+((4.0*Xstar**0.5)/(delta_0**2.0*C_0**0.5)))**0.5 - 1 )**2 #!eq10
@@ -199,30 +201,32 @@ def HeymsfieldWestbrook2010(diaSpec, mass, area,
 
 
 def KhvorostyanovCurry2005(diam, mass, area,
-	                       rho_air=_rho0, nu_air=_nu0, smooth=False):
+						   rho_air=_rho0, nu_air=_nu0, smooth=False):
 	"""
-	TODO PUT SOME REFERENCE HERE
+	Khvorostyanov, V. I., & Curry, J. A.    (2005).    Fall velocities of hydrometeors in the atmosphere:
+	Refinements to a continuous analytical power law.Journal of the Atmospheric Sciences,62(12), 4343-4357.
+	doi:  10.1175/JAS3622.1
 
-    Parameters:
-    -----------
-    diam : array(Nparticles) double
-    	spectrum of diameters of the particles [meters]
-    rho_air : scalar double
-    	air density [kilograms/meter**3]
-    nu_air : scalar double
-    	air kinematic viscosity [meters**2/seconds]
-    mass : array(Nparticles) double
-    	mass of the particles [kilograms]
-    area : array(Nparticles) double
-    	cross section area [meters**2]
-    smooth : scalar bool
-    	Decide wheather or not use the smooth approximation for the estimation
-    	of the drag coefficient from the Best number X
+	Parameters
+	----------
+	diam : array(Nparticles) double
+		spectrum of diameters of the particles [meters]
+	rho_air : scalar double
+		air density [kilograms/meter**3]
+	nu_air : scalar double
+		air kinematic viscosity [meters**2/seconds]
+	mass : array(Nparticles) double
+		mass of the particles [kilograms]
+	area : array(Nparticles) double
+		cross section area [meters**2]
+	smooth : scalar bool
+		Decide wheather or not use the smooth approximation for the estimation
+		of the drag coefficient from the Best number X
 
-    Returns:
-    --------
-    velSpec : array(Nparticles) double
-    	terminal fallspeed computed according to the model [meters/second]
+	Returns
+	-------
+	velSpec : array(Nparticles) double
+		terminal fallspeed computed according to the model [meters/second]
 	"""
 
 	# Best number eq. (2.4b) with buoyancy

@@ -3,7 +3,7 @@
 
 This module provides a list of ice and water refractive index models to compute 
 the dielectric properties of ice according to the requested frequencies and
-temeperatures. The module is completed with some Effective Medium approximation
+temperatures. The module is completed with some Effective Medium approximation
 functions to compute the refractive index of inhomogeneous mixtures of materials
 which are directly used to compute the dielectric properties of snow as a
 dilution of ice in air.
