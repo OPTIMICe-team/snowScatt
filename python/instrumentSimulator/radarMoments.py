@@ -25,6 +25,7 @@ import numpy as np
 from snowScatt import refractiveIndex
 from snowScatt._compute import _c
 from snowScatt._compute import backscatter
+from snowScatt._compute import _convert_to_array
 
 def dB(x):
 	"""
@@ -142,6 +143,56 @@ def Ze(diameters, psd, wavelength, properties,
 	return Z
 
 
-def calcMoments(x, y, n):
-	raise NotImplementedError('Sorry, this is not ready yet')
-	return None
+def calcMoments(spectrum, vel, n=4):
+	""" calculate moments of spectrum(vel) up to order n.
+	The maximum order implemented is 4 (kurtosis). The moments available are:
+	0: reflectivity
+	1: mean Doppler velocity
+	2: spectrum width
+	3: skweness
+	4: kurtosis
+
+	Parameters
+	----------
+	spectrum : array(Nvel) - double
+		specific reflectivity spectrum in linear units
+		(millimeter6 meters-3) !!! be careful this is already multiplied by dV
+		so that sum(spectrum)=Z
+	vel : array(Nvel) - double
+		vector of velocities upon which spectrum is defined
+	n : scalar - integer
+		maximum order of moments to calculate
+		for any moment n>=1 the 0...n-1 moments have to be calculated anyway
+		so the computational burden does not increase
+	Returns
+	-------
+	moments : array(n) - double
+		array of Doppler radar moments ordered from 0 to n
+
+	Raises
+	------
+	AttributeError : if the order n is larger than the maximum 4
+
+
+	"""
+	spec = _convert_to_array(spectrum)
+	v = _convert_to_array(vel)
+	#if len() # maybe check if the two vectors have equal sizes
+	if n>4:
+		raise AttributeError('Only moments up to 4 (kurtosis) are supported')
+
+	Z = sum(spec)
+	MDV = sum(spec*v)/Z
+	res = v-MDV
+	diff = res*res # **2
+	SW = np.sqrt(sum(spec*diff)/Z)
+	diff *= res # **3
+	norm = SW*SW*SW # **3
+	Sk = sum(spec*diff/(Z*norm)) # I guess from this moment on we can potentially iterate
+	diff *= res # **4
+	norm *= SW # **4
+	k = sum(spec*diff/(Z*norm))
+	
+	moments = np.array([Z, MDV, SW, Sk, k])
+
+	return moments[:n]

@@ -29,6 +29,29 @@ from snowScatt._compute import _c
 
 from snowScatt import refractiveIndex
 
+def rescaleSpectrum(spectrum, dopplerVel, dopplerGrid):
+	""" Rescale uneven spectrum centered over dopplerVel onto a (possibly)
+		even dopplerGrid
+
+	This function implements a basic interpolator of the spectrum defined over
+	the dopplerVel points into the dopplerGrid points.
+	It ensures that the integral (reflectivity) is conserved
+
+	Parameters
+	----------
+	spectrum : array(Nparticles) - double
+		the Doppler spectrum defined over the (uneven) grid of velocities
+	dopplerVel : array(Nparticles) - double
+		the (uneven) grid of velocities
+	dopplerGrid : array(Nbins) - double
+		the output grid of velocities (possibly equally spaced)
+
+	Returns
+	-------
+	rescaledSpectrum : array(Nbins) - double
+		the spectrum rescaled on the new grid
+	"""
+	raise NotImplementedError('I am still thinking about how to do this the best way')
 
 def dopplerSpectrum(diameters, psd, wavelength, properties, 
 					ref_index=None, temperature=None,
@@ -72,6 +95,9 @@ def dopplerSpectrum(diameters, psd, wavelength, properties,
 	-------
 		spectrum : array(Nparticles) - double
 			specific radar reflectivity size spectrum [mm**6 m**-3 (m/s)**-1]
+		dopplerVel : array(Nparticle) - double
+			Doppler velocities computed from the spectrum of diamters and sorted
+			in ascending order (not rescaled to a equi-spaced grid)
 
 	"""
 	freq = _c/wavelength
@@ -96,8 +122,8 @@ def dopplerSpectrum(diameters, psd, wavelength, properties,
 
 
 def sizeSpectrum(diameters, psd, wavelength, properties, 
-					ref_index=None, temperature=None,
-					mass=None, theta=0.0):
+				 ref_index=None, temperature=None,
+				 mass=None, theta=0.0):
 	""" radar spectrum simulator
 	Simulates the size spectrum of the reflectivity given the particle 
 	properties and the PSD
