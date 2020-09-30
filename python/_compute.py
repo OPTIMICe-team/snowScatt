@@ -60,7 +60,10 @@ def _convert_to_array(x):
 
 def _prepare_input(diameters, wavelength, properties,
                    ref_index=None, temperature=None, 
-                   mass=None, theta=0.0):
+                   massScattering=None, theta=0.0,
+                   velocity_model='Boehm92', kwargsVelocity={},
+                   massVelocity=None, areaVelocity=None):
+
     diameters = _convert_to_array(diameters)
     wavelength = wavelength*np.ones_like(diameters)
 
@@ -74,13 +77,15 @@ def _prepare_input(diameters, wavelength, properties,
     else:
         ref_index = ref_index*np.ones_like(diameters)
 
-    kappa, beta, gamma, zeta1, alpha_eff, ar_mono, mass_prop, vel, area = snowLibrary(diameters, properties)
-    
-    if mass is None:
+    params = snowLibrary(diameters, properties,
+                         velocity_model, kwargsVelocity,
+                         massVelocity, areaVelocity) # velocity is already computed using massVelocity and areaVelocity if != None
+    kappa, beta, gamma, zeta1, alpha_eff, ar_mono, mass_prop, vel, area = params
+    if massScattering is None:
         logging.debug('compute masses from snow properties')
         mass = mass_prop
     else:
-        mass = mass*np.ones_like(diameters)
+        mass = massScattering*np.ones_like(diameters)
     
     Vol = mass/_ice_density
     
@@ -92,7 +97,9 @@ def _prepare_input(diameters, wavelength, properties,
 
 
 def calcProperties(diameters, wavelength, properties, ref_index=None,
-                   temperature=None, mass=None, theta=0.0, Nangles=181):
+                   temperature=None, massScattering=None, theta=0., Nangles=181,
+                   velocity_model='Boehm92', kwargsVelocity={},
+                   massVelocity=None, areaVelocity=None):
     """
     This is the main function of the snowScatt module. It is a python interface 
     to the snowLibrary and the low level C functions that compute the SSRGA
@@ -128,10 +135,12 @@ def calcProperties(diameters, wavelength, properties, ref_index=None,
         refractive index of ice for the requested wavelength according to the
         Iwabuchi et al. (2011) model. If an array-like is passed than it must
         have length=Nparticles.
-    mass : array-like or scalar double (optional)
+    massScattering : array-like or scalar double (optional)
         Mass of the snowflake particles. If an array-like is passed than it must
         have length=Nparticles. If left unset the mass is calculated from the
-        snowLibrary properties.
+        snowLibrary properties. Override only the mass for the scattering
+        computation; in order to override also the one for the fallspeed
+        simulation set the overloadMass parameter.
     theta : scalar double (optional default is 0.0 zenith)
         Polar incidence angle [radians] defaults to 0.0 (zenith-pointing).
         The incidence angle is used only to compute the effective size of the
@@ -145,6 +154,30 @@ def calcProperties(diameters, wavelength, properties, ref_index=None,
         phase function is calculated with a 1 degree resolution. The scattering
         properties are calculated by integrating the phase function so
         increasing Nangle will also increase the computation accuracy
+    velocity_model : string
+        string identifing the fallspeed velocity model.
+        Currently available models are Boehm92 (default), HeymsfieldWestbrook10,
+        KhvorostyanovCurry05, Boehm89. Look at the documentation of the
+        _fallSpeedModels and the _readProperties modules for a complete list
+    kwargsVelocity : dictionary
+        dictionary of additional arguments to pass to the velocity model.
+        For example all models accept rho_air and nu_air as additional arguments
+        to set air density and viscosity (default values set in _constants.py
+        module). Boehm92 additional accept as_ratio, HeymsfieldWestbrook05 the k
+        parameter for laminar/turbulent flow parametrization.
+        Look at the documentation of the _fallSpeedModels module for a better
+        explanation of the specific arguments for each fallspeed model.
+    massVelocity : array-like(Nparticles) or scalar [kilograms]
+        if not None overloads the mass computed with "properties" to calculate
+        the fallspeed. The return value of mass is still the one computed by the
+        internal library. The code does not check if unphysical values are
+        passed from the user (like density exceeding the one of same sized solid
+        ice).
+    areaVelocity : array-like(Nparticles) or scalar [meters**2]
+        if not None overloads the area computed with "properties" to calculate
+        the fallspeed. The return value of area is still the one computed by the
+        internal library. The code does not check if unphysical values are
+        passed from the user (like exceeding the area of same sized full disk).
 
     Returns
     -------
@@ -166,8 +199,11 @@ def calcProperties(diameters, wavelength, properties, ref_index=None,
         the average mass of the snowflakes for which the SSRGA parameters have
         been derived 
     vel : array(Nparticles) - double
-        Average terminal fallspeed (meters/second). Computed using the Boehm
-        model (2005).
+        Terminal fallspeed (meters/second) as computed from the
+        specified hydrodynamic model.
+    area : array(Nparticles) - double
+        Snowflake vertical projected area [meters**2] computed from the
+        average snow properties fit
 
     Raises
     ------
@@ -175,7 +211,9 @@ def calcProperties(diameters, wavelength, properties, ref_index=None,
     """
 
     params = _prepare_input(diameters, wavelength, properties,
-                            ref_index, temperature, mass, theta)
+                            ref_index, temperature, massScattering, theta,
+                            velocity_model, kwargsVelocity,
+                            massVelocity, areaVelocity)
     Deff, Vol, wavelength, K, kappa, gamma, beta, zeta1, mass_prop, vel, area = params
     Cext, Cabs, Csca, Cbck, asym, phase = ssrga(Deff, Vol, wavelength, K,
                                                 kappa, gamma, beta, zeta1,
@@ -185,44 +223,216 @@ def calcProperties(diameters, wavelength, properties, ref_index=None,
 
 
 def backscatter(diameters, wavelength, properties, ref_index=None,
-                temperature=None, mass=None, theta=0.0):
+                temperature=None, massScattering=None, theta=0.0):
     """
-    Python interface to the fast computation of radar backscattering cross section using SSRGA.
-    Unlike the ordinary SSRGA, this function only solve the RGA problem for the
-    backscattering direction, avoiding the calculation of the full phase
-    function and the integration over the solid angle needed to compute the
-    total scattering cross section. It is expected to provide an improvement in
-    computational performances in the order of Nangle.
+    Python interface to the fast computation of radar backscattering cross
+    section using SSRGA.
+    Unlike the ordinary SSRGA used by calcProperties, this function only solve
+    the RGA problem for the backscattering direction, avoiding the calculation
+    of the full phase function and the integration over the solid angle needed
+    to compute the total scattering cross section. It is expected to provide an
+    improvement in computational performances in the order of Nangle.
+    
+    Parameters
+    ----------
+    diameters : array-like or scalar double
+        Snowflake diameters [meters] for which the scattering and microphysical
+        properties are to compute. The number of passed diameters will define
+        the number of different particles (Nparticles).
+    wavelength : array-like or scalar double
+        Wavelength in the vacuum [meters] of the incident electromagnetic wave.
+        If an array-like is passed than it must have length=Nparticles.
+    properties : string
+        Label that defines the type of particle. Call snowLibrary.info() for a
+        list of available snowflake properties
+    ref_index : array-like or scalar complex (optional)
+        Refractive index of the ice. If an array-like is passed than it must
+        have length=Nparticles. If not set than the temperature attribute must
+        be set
+    temperature : array-like or scalar double (optional)
+        Ambient temperature. Ignored if ref_index is set. Computes the complex 
+        refractive index of ice for the requested wavelength according to the
+        Iwabuchi et al. (2011) model. If an array-like is passed than it must
+        have length=Nparticles.
+    massScattering : array-like or scalar double (optional)
+        Mass of the snowflake particles. If an array-like is passed than it must
+        have length=Nparticles. If left unset the mass is calculated from the
+        snowLibrary properties.
+    theta : scalar double (optional default is 0.0 zenith)
+        Polar incidence angle [radians] defaults to 0.0 (zenith-pointing).
+        The incidence angle is used only to compute the effective size of the
+        particle along the propagation direction (together with the information
+        on particle aspect ratio). It ranges from 0 to pi. The code consider the
+        snowflake overall shape to be spheroidal and thus there will be simmetry
+        around pi/2 for this angle.
+    
+    Returns
+    -------
+    Cbck : array(Nparticles) - double
+        Radar backscattering cross section (meters**2)
     """
+
     params = _prepare_input(diameters, wavelength, properties,
-                            ref_index, temperature, mass, theta)
+                            ref_index, temperature, massScattering, theta,
+                            velocity_model, kwargsVelocity,
+                            massVelocity, areaVelocity)
     Deff, Vol, wavelength, K, kappa, gamma, beta, zeta1, mass_prop, vel, area = params
     
     return ssrgaBack(Deff, Vol, wavelength, K, kappa, gamma, beta, zeta1)
 
 
 def backscatVel(diameters, wavelength, properties, ref_index=None,
-                temperature=None, mass=None, theta=0.0):
+                temperature=None, massScattering=None, theta=0.0,
+                velocity_model='Boehm92', kwargsVelocity={},
+                massVelocity=None, areaVelocity=None):
     """
     Convenience function for the implementation of a simple Radar Doppler
     simulator. It computes backscattering fast as the backscatter function, but
     it also returns the array of velocities since they are already extracted
     from the library
+
+    Parameters
+    ----------
+    diameters : array-like or scalar double
+        Snowflake diameters [meters] for which the scattering and microphysical
+        properties are to compute. The number of passed diameters will define
+        the number of different particles (Nparticles).
+    wavelength : array-like or scalar double
+        Wavelength in the vacuum [meters] of the incident electromagnetic wave.
+        If an array-like is passed than it must have length=Nparticles.
+    properties : string
+        Label that defines the type of particle. Call snowLibrary.info() for a
+        list of available snowflake properties
+    ref_index : array-like or scalar complex (optional)
+        Refractive index of the ice. If an array-like is passed than it must
+        have length=Nparticles. If not set than the temperature attribute must
+        be set
+    temperature : array-like or scalar double (optional)
+        Ambient temperature. Ignored if ref_index is set. Computes the complex 
+        refractive index of ice for the requested wavelength according to the
+        Iwabuchi et al. (2011) model. If an array-like is passed than it must
+        have length=Nparticles.
+    massScattering : array-like or scalar double (optional)
+        Mass of the snowflake particles. If an array-like is passed than it must
+        have length=Nparticles. If left unset the mass is calculated from the
+        snowLibrary properties. Override only the mass for the scattering
+        computation; in order to override also the one for the fallspeed
+        simulation set the massVelocity parameter
+    theta : scalar double (optional default is 0.0 zenith)
+        Polar incidence angle [radians] defaults to 0.0 (zenith-pointing).
+        The incidence angle is used only to compute the effective size of the
+        particle along the propagation direction (together with the information
+        on particle aspect ratio). It ranges from 0 to pi. The code consider the
+        snowflake overall shape to be spheroidal and thus there will be simmetry
+        around pi/2 for this angle.
+    velocity_model : string (optional default Boehm92)
+        string identifing the fallspeed velocity model.
+        Currently available models are Boehm92 (default), HeymsfieldWestbrook10,
+        KhvorostyanovCurry05, Boehm89. Look at the documentation of the
+        _fallSpeedModels and the _readProperties modules for a complete list
+    kwargsVelocity : dictionary (optional default parameters in _constants.py)
+        dictionary of additional arguments to pass to the velocity model.
+        For example all models accept rho_air and nu_air as additional arguments
+        to set air density and viscosity (default values set in _constants.py
+        module). Boehm92 additional accept as_ratio, HeymsfieldWestbrook05 the k
+        parameter for laminar/turbulent flow parametrization.
+        Look at the documentation of the _fallSpeedModels module for a better
+        explanation of the specific arguments for each fallspeed model.
+    massVelocity : array-like(Nparticles) or scalar [kilograms]
+        if not None overloads the mass computed with "properties" to calculate
+        the fallspeed. The return value of mass is still the one computed by the
+        internal library. The code does not check if unphysical values are
+        passed from the user (like density exceeding the one of same sized solid
+        ice).
+    areaVelocity : array-like(Nparticles) or scalar [meters**2]
+        if not None overloads the area computed with "properties" to calculate
+        the fallspeed. The return value of area is still the one computed by the
+        internal library. The code does not check if unphysical values are
+        passed from the user (like exceeding the area of same sized full disk).
+    
+    Returns
+    -------
+    Cbck : array(Nparticles) - double
+        Radar backscattering cross section (meters**2)
+    vel : array(Nparticles) - double
+        Terminal fallspeed (meters/second) as computed from the
+        specified hydrodynamic model
     """
+
     params = _prepare_input(diameters, wavelength, properties,
-                            ref_index, temperature, mass, theta)
+                            ref_index, temperature, massScattering, theta,
+                            velocity_model, kwargsVelocity,
+                            massVelocity, areaVelocity)
     Deff, Vol, wavelength, K, kappa, gamma, beta, zeta1, mass_prop, vel, area = params
     
     return ssrgaBack(Deff, Vol, wavelength, K, kappa, gamma, beta, zeta1), vel
 
 
-def snowMassVelocityArea(diameters, properties):
+def snowMassVelocityArea(diameters, properties,
+                         velocity_model='Boehm92', kwargsVelocity={},
+                         massVelocity=None, areaVelocity=None):
     """
     Convenience function to extract directly mass, velocity and area for a
-    specific set of sizes and a particle in the database
+    specific set of sizes and a particle in the database. Through the
+    overloadMass and overloadArea parameters the user can also tune the mass and
+    the area to values different from the one included in the library. If both
+    quantities are user defined, the 'properties' argument becomes unnecessary
+    for the computation of the fallspeed.
+
+    Parameters:
+    -----------
+    diameters : array-like(Nparticles) or scalar double [meters]
+        Snowflake diameters [meters] for which the scattering and microphysical
+        properties are to compute. The number of passed diameters will define
+        the number of different particles (Nparticles).
+    properties : string
+        Label that defines the type of particle. Call snowLibrary.info() for a
+        list of available snowflake properties
+    velocity_model : string
+        string identifing the fallspeed velocity model.
+        Currently available models are Boehm92 (default), HeymsfieldWestbrook10,
+        KhvorostyanovCurry05, Boehm89. Look at the documentation of the
+        _fallSpeedModels and the _readProperties modules for a complete list
+    kwargsVelocity : dictionary
+        dictionary of additional arguments to pass to the velocity model.
+        For example all models accept rho_air and nu_air as additional arguments
+        to set air density and viscosity (default values set in _constants.py
+        module). Boehm92 additional accept as_ratio, HeymsfieldWestbrook05 the k
+        parameter for laminar/turbulent flow parametrization.
+        Look at the documentation of the _fallSpeedModels module for a better
+        explanation of the specific arguments for each fallspeed model.
+    massVelocity : array-like(Nparticles) or scalar [kilograms]
+        if not None overloads the mass computed with "properties" to calculate
+        the fallspeed. The return value of mass is still the one computed by the
+        internal library. The code does not check if unphysical values are
+        passed from the user (like density exceeding the one of same sized solid
+        ice).
+    areaVelocity : array-like(Nparticles) or scalar [meters**2]
+        if not None overloads the area computed with "properties" to calculate
+        the fallspeed. The return value of area is still the one computed by the
+        internal library. The code does not check if unphysical values are
+        passed from the user (like exceeding the area of same sized full disk).
+
+    Returns
+    -------
+    mass : array(Nparticles) - double
+        Particle mass as assumed by the snowLibrary properties (kilograms). It
+        is derived from a power-law fit capped by the sphere maximum density of
+        solid ice
+    vel : array(Nparticles) - double
+        Average terminal fallspeed (meters/second).
+        Computed by default using the Boehm model (1992).
+    area : array(Nparticles) - double
+        Snowflake vertical projected area [meters**2] computed from the
+        average snow properties fit. It is derived from a power-law fit capped
+        the maximum area projected by a full disk of the smae diameter
     """
     
     diameters = _convert_to_array(diameters)
-    _, _, _, _, _, _, mass, vel, area = snowLibrary(diameters, properties)
+    _, _, _, _, _, _, mass, vel, area = snowLibrary(diameters, properties,
+                                                    velocity_model,
+                                                    kwargsVelocity,
+                                                    massVelocity,
+                                                    areaVelocity)
 
     return mass, vel, area

@@ -183,7 +183,9 @@ class snowProperties():
 		self._fileList = snowList
 		logging.info('Initialize a library of snow properties')
 
-	def __call__(self, diameters, identifier, velocity_model='Boehm92'):
+	def __call__(self, diameters, identifier,
+				 velocity_model='Boehm92', kwargsVelocity={}, # TODO bring this to _compute module, it doesn't make too much sense to be here
+				 massVelocity=None, areaVelocity=None):
 		logging.debug('return the snow properties for selected sizes')
 		if identifier in self._library.keys():
 			logging.debug('got AVG '+identifier+str(self._library[identifier]))
@@ -194,7 +196,6 @@ class snowProperties():
 			alpha_eff = np.ones_like(diameters)*self._library[identifier]['aspect']
 			ar_mono = np.ones_like(diameters)*self._library[identifier]['ar_mono']
 			mass = self._library[identifier]['am']*diameters**self._library[identifier]['bm']
-			# vel = self._library[identifier]['av']*diameters**self._library[identifier]['bv']
 			area = self._library[identifier]['aa']*diameters**self._library[identifier]['ba']
 
 		elif identifier in self._fileList.keys():
@@ -203,8 +204,6 @@ class snowProperties():
 				line = f.read().split('#')[-1].split('\n')[0]
 				am = float(line.split('am=')[-1].split(',')[0])
 				bm = float(line.split('bm=')[-1].split(',')[0])
-				#av = float(line.split('av=')[-1].split(',')[0])
-				#bv = float(line.split('bv=')[-1].split(',')[0])
 				aa = float(line.split('aa=')[-1].split(',')[0])
 				ba = float(line.split('ba=')[-1].split(',')[0])
 				ar_mono = float(line.split('monomer_alpha=')[-1].split(',')[0])
@@ -223,7 +222,7 @@ class snowProperties():
 		area = np.minimum(a_disk, area)
 		mass = np.minimum(m_solid, mass)
 
-		vel = fallspeeds[velocity_model](diameters, mass, area) # TODO also need to pass kwargs additional
+		vel = fallspeeds[velocity_model](diameters, mass, area, **kwargsVelocity) # TODO also need to pass kwargs additional and bring to the _compute module
 
 		return np.asarray(kappa), np.asarray(beta), np.asarray(gamma), np.asarray(zeta1), np.asarray(alpha_eff), np.asarray(ar_mono), np.asarray(mass), np.asarray(vel), np.asarray(area)
 
