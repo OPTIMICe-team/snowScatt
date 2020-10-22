@@ -1,1 +1,14 @@
-put data needed for the scripts here as symbolic links to the correct path
+This is a collection of scripts that will reproduce the plots and analysis presented in "snowScatt 1.0: Consistent model of microphysical and scattering properties of rimed and unrimed snowflakes based on the self-similar Rayleigh-Gans Approximation" to be submitted to Geophysical Model Development
+
+This text will illustrate the steps needed to reproduce such figures
+
+DEPENDENCIES:
+- It is assumed that you successfully installed the snowScatt (at least version 1.0) package
+- Python packages: numpy, scipy, pandas, xarray, netcdf4, 
+- pytmatrix available on pip and https://github.com/jleinonen/pytmatrix
+- scattnlay https://github.com/ovidiopr/scattnlay
+
+DATASETS:
+The scripts expect to find the required data files under the data/ folder
+- Download the dedicated auxiliary data package from Zenodo https://doi.org/10.5281/zenodo.4118243 and unpack the compressed archive in the data/ folder
+- Fig.9 Download the LV2 data from 24.11.2015 Tripex campaign and place the netCDF file in the data/ folder https://zenodo.org/record/1341390/files/tripex_joy_tricr00_l2_any_v00_20151124000000.nc
