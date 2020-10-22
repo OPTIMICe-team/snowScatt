@@ -34,6 +34,7 @@ for i, shapefile in enumerate(shapefiles):
     shape = np.loadtxt(shapefile)[:,0:3]
     d = 40.0e-6 # if I do not have metadata I am just assuming it is 40um
     d = 20.0e-6
+    # d = 1.0 # if the shapefile is not on a regular grid d == 1
     # Calculates Dmax myself
     try:
         hull3d=ConvexHull(shape)
@@ -54,17 +55,19 @@ for i, shapefile in enumerate(shapefiles):
     # Calculates projected area, along z axis
     xy = (0, 1) # drop z coordinate
     projection=pd.DataFrame(shape[:, xy]).drop_duplicates().values
+    #projection=pd.DataFrame(np.round(shape[:, xy]/d)).drop_duplicates().values*d # if you do not have a regular grid you need to regularize it first...
     area = projection.shape[0]*d**2
     mass = shape.shape[0]*d**3*_ice_density
     vel_B92 = B92(dmax, mass, area) # perhaps aspect ratio?
     vel_KC = KC05(dmax, mass, area)
     # Calculate area function, along z axis
-    area_func = ssrga.area_function(shape*d, d, dmax, theta=np.pi*float(deg)/180.0)
+    area_func = ssrga.area_function(shape*d, d, dmax, theta=np.pi*float(deg)/180.0) # multiply by resolution if you have a regular grid
+    #area_func = ssrga.area_function(shape, d, dmax, theta=np.pi*float(deg)/180.0) # if you have full precision floating point coordinates do this
     #area_func = ssrga.area_function(shape*d, d, dmax, theta=np.pi*np.array([0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0])/180.0)
     
     # Put data in a DataFrame
     data.loc[i] = [dmax, mass, area, area_func, d, vel_B92, vel_KC]
-data.to_hdf('area_functions_'+deg+'.h5', key='area')
+data.to_hdf('area_functions_'+deg+'.h5', key='area') # save area_functions on a hdf5 file
 
 #%% Create bins for SSRGA
 minBin = 2.0e-3
