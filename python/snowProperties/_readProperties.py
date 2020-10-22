@@ -176,8 +176,16 @@ DOcollColumns = {'path':module_path+'/ssrga_coeffs_Ori_collection_columns.csv',
                  'msg':'Table of Davide Ori aggregates of collection of columns'}
 snowList['Ori_collColumns'] = DOcollColumns
 
-## Class to manage the library of snow properties
+
 class snowProperties():
+	def __init__(self):
+		# In principle this could be a parent class, separate init for average and table properties. 
+		# The average is nothing more than a table with only one entry for all sizes, or??? it is just the dictionary interface that is easier
+		raise NotImplementedError('It would be probably easier if the snow library returns a snowProperty object based on an identifier on call, but we are not ready yet')
+
+
+## Class to manage the library of snow properties
+class snowLibraryClass():
 	def __init__(self):
 		self._library = snowLib
 		self._fileList = snowList
@@ -258,4 +266,4 @@ class snowProperties():
 
 
 # Create the Library
-snowLibrary = snowProperties()
+snowLibrary = snowLibraryClass()
