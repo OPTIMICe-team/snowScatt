@@ -6,7 +6,7 @@ from IPython.core.debugger import set_trace
 import snowScatt
 
 # Set the global font to be DejaVu Sans, size 10 (or any other sans-serif font of your choice!)
-rc('font',**{'family':'sans-serif','sans-serif':['DejaVu Sans'],'size':8})
+rc('font',**{'family':'sans-serif','sans-serif':['DejaVu Sans'],'size':11})
 
 # Set the font used for MathJax - more on this later
 rc('mathtext',**{'default':'regular'})
@@ -78,16 +78,17 @@ def litSnowProp(diameters,particle,velocity_model="Boehm92"):
 
 if __name__ == "__main__":
 
-    particle_types = ["vonTerzi_plate","vonTerzi_dendrite","vonTerzi_column","vonTerzi_needle","vonTerzi_mixcoldend","Leinonen15tabA02","Leinonen15tabA05","Leinonen15tabA20"]
+    particle_types = ["vonTerzi_plate","vonTerzi_plate","vonTerzi_dendrite","vonTerzi_column","vonTerzi_needle","vonTerzi_mixcoldend","Leinonen15tabB02","Leinonen15tabB05","Leinonen15tabB20", "Ori_collColumns", "Ori_collColumns"]
+    particle_labels = ["This study:","CaE plate","CaE dendrite","CaE column","CaE needle","CaE mix","LS15 B02","LS15 B05","LS15 B20", "Ori14 column", "Observations:"]
 
     diameters   = np.logspace(-4,np.log10(4e-2))
 
     #for plotting
     fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(8,8))
     #               plate,dendrite,column,needle,mix2,tabA02,tabA05,tabA20
-    linestyles  =   ["-","--",      ":",  "-.",    "-","-",   "--" , "-", "-.",":","-","--","-.",":","-","--"]
-    markers     =   ["", ""  ,      "" ,   "" ,    "x" ,"",      "", "x","","","","","","","",""]
-    colors      =   ["g", "g",      "g",   "g",    "g" ,"magenta","magenta", "magenta","dodgerblue","dodgerblue","dodgerblue","blue","blue","blue","black","black"]
+    linestyles  =   ["None","-","--",      ":",  "-.",    "-","-",   "--" , "-", "-","None", "-.",":","-","--","-.",":","-","--"]
+    markers     =   ["None","", ""  ,      "" ,   "" ,    "x", "",      "", "x","","None", "","","","","","","",""]
+    colors      =   ["None", "g", "g",      "g",   "g",    "g" ,"magenta","magenta", "magenta","orange","None","dodgerblue","dodgerblue","dodgerblue","blue","blue","blue","black","black"]
 
     #plot modelled particles
     for i_p,particle_type in enumerate(particle_types):
@@ -95,26 +96,28 @@ if __name__ == "__main__":
         #get particle properties from the database
         mass, vel, area = snowScatt.snowMassVelocityArea(diameters, particle_type)
   
-        axes[0,0].loglog(diameters,mass,linestyle=linestyles[i_p],marker=markers[i_p],markevery=5,color=colors[i_p],label=particle_types[i_p]) 
-        axes[0,1].loglog(diameters,area,linestyle=linestyles[i_p],marker=markers[i_p],markevery=5,color=colors[i_p],label=particle_types[i_p]) 
-        axes[1,0].semilogx(diameters,vel,linestyle=linestyles[i_p],marker=markers[i_p],markevery=5,color=colors[i_p],label=particle_types[i_p]) 
+        axes[0,0].loglog(diameters,mass,linestyle=linestyles[i_p],marker=markers[i_p],markevery=5,color=colors[i_p],label=particle_labels[i_p]) 
+        axes[0,1].loglog(diameters,area,linestyle=linestyles[i_p],marker=markers[i_p],markevery=5,color=colors[i_p],label=particle_labels[i_p]) 
+        axes[1,0].semilogx(diameters,vel,linestyle=linestyles[i_p],marker=markers[i_p],markevery=5,color=colors[i_p],label=particle_labels[i_p]) 
         
     #plot observations 
     particle_types  = ["M96_mixS3","M96_sideplane","M96_polycrys","LH74_dendrite","LH74_mixed","LH74_sideplanes","LH74_ldgraupel","LH74_hdgraupel"]
+    particle_labels  = ["M96 mixS3","M96 sideplane","M96 polycrys","LH74 dendrite","LH74 mixed","LH74 sideplanes","LH74 ldgraupel","LH74 hdgraupel"]
+
     for i_pLit,particle in enumerate(particle_types):
 
         mass,vel, area = litSnowProp(diameters,particle,velocity_model="Boehm92")
 
-        axes[0,0].loglog(diameters,mass,linestyle=linestyles[i_p+i_pLit+1],marker=markers[i_p+i_pLit+1],color=colors[i_p+i_pLit+1],label=particle_types[i_pLit]) 
-        axes[0,1].loglog(diameters,area,linestyle=linestyles[i_p+i_pLit+1],marker=markers[i_p+i_pLit+1],color=colors[i_p+i_pLit+1],label=particle_types[i_pLit]) 
+        axes[0,0].loglog(diameters,mass,linestyle=linestyles[i_p+i_pLit+1],marker=markers[i_p+i_pLit+1],color=colors[i_p+i_pLit+1],label=particle_labels[i_pLit]) 
+        axes[0,1].loglog(diameters,area,linestyle=linestyles[i_p+i_pLit+1],marker=markers[i_p+i_pLit+1],color=colors[i_p+i_pLit+1],label=particle_labels[i_pLit]) 
 
         if "av" in litSnowPropDic[particle].keys(): 
-            axes[1,0].semilogx(diameters,vel,linestyle=linestyles[i_p+i_pLit+1],marker=markers[i_p+i_pLit+1],color=colors[i_p+i_pLit+1],label=particle_types[i_pLit]) 
+            axes[1,0].semilogx(diameters,vel,linestyle=linestyles[i_p+i_pLit+1],marker=markers[i_p+i_pLit+1],color=colors[i_p+i_pLit+1],label=particle_labels[i_pLit]) 
 
     #formatting the plots
     xlabels = [r'$D_{max}$ [m]', r'$D_{max}$ [m]',r'$D_{max}$ [m]', '']
-    ylabels = [r'm [kg]', r'A [m2]',r'$v_{term}$ [m/s]' , '']
-    letters = ['a) ', 'b) ', 'c) ','d) ','e)','f)']
+    ylabels = [r'm [kg]', r'A [m$^2$]',r'$v_{term}$ [ms$^{-1}$]' , '']
+    letters = ['(a) ', '(b) ', '(c) ','(d) ','(e)','(f)']
     xticks = range(1,6)
     xticklabels = range(1,6)
 
@@ -148,7 +151,7 @@ if __name__ == "__main__":
             #create and ordered dictionary such that duplicates are remove duplicates
             by_label = OrderedDict(zip(labels_flat, handles_flat))
             # add a legend for the whole figure
-            fig.legend(by_label.values(),by_label.keys(),bbox_to_anchor=(0.8,0.25), loc="lower center", 
+            fig.legend(by_label.values(),by_label.keys(),bbox_to_anchor=(0.75,0.15), loc="lower center", 
                                     bbox_transform=fig.transFigure, ncol=2)
 
     axes[0,0].grid(b=True,which="both")
@@ -160,3 +163,4 @@ if __name__ == "__main__":
     out_filestring = "particle_properties"
 
     fig.savefig(out_filestring + '.png', dpi=100)
+    fig.savefig(out_filestring + '.pdf')
