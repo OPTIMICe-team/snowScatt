@@ -24,27 +24,23 @@ import itertools
 from datetime import datetime
 
 plt.rcParams.update({'font.size':8})
-figfolder = 'figs_ssrga_evaluation/'
-filename = 'scattering_data.nc'
+filename = 'data/scattering_data_temp.nc'
 
-particle_types = [#'column',
-                  #'dendrite',
+particle_types = [
                   'Leinonen/subsequent-0.5',
                   'Leinonen/subsequent-1.0',
                   'needle',
                   'mixcolumndend',
                   ]
 
-ssrga_particle_names = [#'vonTerzi_column',
-                        #'vonTerzi_dendrite',
+ssrga_particle_names = [
                         'Leinonen15tabB05',
                         'Leinonen15tabB10',
                         'vonTerzi_needle',
                         'vonTerzi_mixcoldend',
                         ]
 
-legend_labels = [#'column',
-                  #'dendrite',
+legend_labels = [
                   'rimed 0.5',
                   'rimed 1.0',
                   'unrimed needle',
@@ -67,12 +63,6 @@ freqs = [1.8000, 5.6000, 9.6000, 13.600, 35.600, 89.000, 94.000,
          664.00, 874.40,]
 frequencies = xr.IndexVariable(dims='frequency', data=np.array(freqs)*1.0e9,
                                attrs={'units':'Hertz'})
-
-#Nangles = 721  # number of angles of the phase function subdivision
-#angles = xr.IndexVariable(dims='scat_angle',
-#                          data=np.linspace(0, np.pi, Nangles),
-#                          attrs={'long_name':'scattering angle',
-#                                 'units':'radians'})
 
 ## Create empty xarray variables
 dims = ['particle_name', 'frequency', 'scattering_model']
@@ -110,7 +100,10 @@ ref_imag = xr.DataArray(dims=['frequency',],
                         coords={'frequency' : frequencies},
                         attrs={'long_name':'ice refractive index',
                                'units':'dimensionless'})
-
+DmaD = xr.DataArray(dims=['particle_name'],
+                    coords={'particle_name':particle_names},
+                    attrs={'long_name':'particle maximum dimension',
+                           'units':'meters'})
 
 ice_density = snowScatt._compute._ice_density
 c = snowScatt._compute._c
@@ -215,6 +208,7 @@ else:
                     mass = Vol*ice_density
                     d = np.cbrt(Vol/Ndipoles)
                     Dmax = dmax*d
+                    DmaD.loc[shapefile] = Dmax
                     
                     Cextx, Cabsx = parseCx(fCx)
                     Cscax = Cextx-Cabsx
@@ -237,7 +231,7 @@ else:
                                                       wavelength=wl,
                                                       properties=ssrga_particle,
                                                       ref_index=ref_index,
-                                                      mass=mass,
+                                                      massScattering=mass,
                                                       Nangles=Nangles)
                     ssCext, ssCabs, ssCsca, ssCbck, ssasym, ssphase, mass_prop, vel, area = SS_RGA
                     Cext.loc[shapefile, f,'SSRGA'] = ssCext[0]
@@ -261,6 +255,7 @@ else:
                  'ref_real':ref_real,
                  'ref_imag':ref_imag,
                  'volume':volume,
+                 'Dmax':DmaD,
                  #'phase':phase,
                  #'mass':mass,
                  #'vel':vel,
@@ -323,7 +318,7 @@ for ipt, particle_type in enumerate(particle_types):
                      )
     axc[0, 0].scatter(Csca.loc[part_sel, :, 'DDA'],
                       Csca.loc[part_sel, :, 'SSRGA'],
-                      label=label_mapping[particle_type],
+                      #label=label_mapping[particle_type],
                       marker=markers[ipt],
                       s=marker_size,
                       c = coloring_var,
@@ -340,14 +335,12 @@ for ipt, particle_type in enumerate(particle_types):
                       zorder=2,
                      )
     
-axc[0, 0].legend()
-
 lims = np.array([1e-14, 1e-3])
 ticks = [1e-13, 1e-10, 1e-7, 1e-4]
 for ax in [axc[0, 0], axc[1, 0], axc[0, 1]]:#, axc[1, 1]]:
-    ax.plot(lims, lims, c='k', zorder=1)
-    ax.plot(lims, 4.0*lims, ls=':', c='k', zorder=1)
-    ax.plot(lims, 0.25*lims, ls=':', c='k', zorder=1)
+    line_solid = ax.plot(lims, lims, c='k', zorder=1, label='1:1 match')
+    dash_upper = ax.plot(lims, 4.0*lims, ls=':', c='k', zorder=1, label='$\pm$ 3 dB')
+    dash_lower = ax.plot(lims, 0.25*lims, ls=':', c='k', zorder=1)
     ax.set_xscale('log')
     ax.set_yscale('log')
     ax.set_xlim(lims)
@@ -356,7 +349,7 @@ for ax in [axc[0, 0], axc[1, 0], axc[0, 1]]:#, axc[1, 1]]:
     ax.set_yticks(ticks)
 
 lims = [0, 1]
-for ax in [axc[1, 1]]:#[axc[0, 2], axc[1, 2]]:
+for ax in [axc[1, 1]]:
     ax.plot(lims, lims, c='k', zorder=1)
     ax.set_xlim(lims)
     ax.set_ylim(lims)
@@ -366,6 +359,7 @@ for ax, l in zip(axc.flatten(), ['(a)', '(b)', '(c)', '(d)']):
     ax.set_xlabel(' DDA   [m$^2$]')
     ax.set_ylabel(' SSRGA   [m$^2$]')
     ax.text(0, 1.02, l,  fontweight='black', transform=ax.transAxes)
+axc[0, 0].legend()
 axc[1, 1].set_xlabel(' DDA')
 axc[1, 1].set_ylabel(' SSRGA')
 
@@ -373,7 +367,6 @@ axc[0, 0].set_title('C$_\mathrm{sca}$')
 axc[0, 1].set_title('C$_\mathrm{abs}$')
 axc[1, 0].set_title('C$_\mathrm{bck}$')
 axc[1, 1].set_title('g')
-#axc[1, 2].set_title('$\omega$')
 
 fC.colorbar(scat[0], ax=axc[:, 1], location='right', aspect=40,
             label='RIMED     frequency [GHz]')
@@ -385,28 +378,25 @@ fC.savefig('evaluation_scattering.pdf')
 
 #%%
 
-particle_types = [#'column',
-                  #'dendrite',
+particle_types = [
                   'Leinonen/subsequent-0.5',
                   'Leinonen/subsequent-1.0',
                   'needle',
                   'mixcolumndend',
                   ]
 
-ssrga_particle_names = [#'vonTerzi_column',
-                        #'vonTerzi_dendrite',
+ssrga_particle_names = [
                         'Leinonen15tabB05',
                         'Leinonen15tabB10',
                         'vonTerzi_needle',
                         'vonTerzi_mixcoldend',
                         ]
 
-legend_labels = [#'column',
-                  #'dendrite',
-                  'SSRGA rimed 0.5',
-                  'SSRGA rimed 1.0',
-                  'SSRGA needle',
-                  'SSRGA mix',
+legend_labels = [
+                  'SSRGA LS15 B05',
+                  'SSRGA LS15 B10',
+                  'SSRGA CaE needle',
+                  'SSRGA CaE mix',
                   ]
 label_mapping = dict(zip(particle_types, legend_labels))
 
@@ -518,25 +508,25 @@ for ipt, (particle_type, ssrga_particle) in enumerate(zip(particle_types, ssrga_
     axs[0].plot(ss_size_par[mask], ssQbck[mask], lw=3,
                 label=label_mapping[particle_type])
 
-JL05 = pd.read_csv('tables/dataJL_B0.5.csv')
+JL05 = pd.read_csv('data/tables/dataJL_B0.5.csv')
 reff05 = mass2reff(JL05.mkg*1.0e-3)
 x05 = 2.0*np.pi*reff05/wavelength
 Qb05 = JL05.Wb/(np.pi*reff05**2)
 Qs05 = JL05.Ws/(np.pi*reff05**2)
-axs[0].scatter(x05, Qb05, c='grey', label='DDA rimed 0.5', s=marker_size)
-axs[1].scatter(x05, Qs05, c='grey', label='DDA rimed 0.5', s=marker_size)
-JL10 = pd.read_csv('tables/dataJL_B1.0.csv')
+axs[0].scatter(x05, Qb05, c='grey', label='DDA LS15 B05', s=marker_size)
+axs[1].scatter(x05, Qs05, c='grey', label='DDA LS15 B05', s=marker_size)
+JL10 = pd.read_csv('data/tables/dataJL_B1.0.csv')
 reff10 = mass2reff(JL10.mkg*1.0e-3)
 x10 = 2.0*np.pi*reff10/wavelength
 Qb10 = JL10.Wb/(np.pi*reff10**2)
 Qs10 = JL10.Ws/(np.pi*reff10**2)
-axs[0].scatter(x10, Qb10, c='k', label='DDA rimed 1.0', s=marker_size)
-axs[1].scatter(x10, Qs10, c='k', label='DDA rimed 1.0', s=marker_size)
+axs[0].scatter(x10, Qb10, c='k', label='DDA LS15 B10', s=marker_size)
+axs[1].scatter(x10, Qs10, c='k', label='DDA LS15 B10', s=marker_size)
 ###############################################################################
 
 ###############################################################################
 
-RHfile = '/home/dori/develop/scatdb/share/scatdb.csv'
+RHfile = 'data/tables/scatdb.csv'
 dataRH = pd.read_csv(RHfile)
 dataRH = dataRH[dataRH.flaketype == 9] # sector snowflake
 #dataRH = dataRH[dataRH.flaketype == 20] # aggregate spherical
@@ -570,7 +560,7 @@ axs[1].grid()
 
 handles, labels = axs[0].get_legend_handles_labels()
 leg = axs[0].legend(handles[:3], labels[:3], loc=2, ncol=1)
-axs[1].legend(handles[3:6], labels[3:6], loc=4, ncol=1)
+axs[1].legend(handles[3:7], labels[3:7], loc=4, ncol=1)
 axs[0].legend(handles[7:], labels[7:], loc=3, ncol=1)
 axs[0].add_artist(leg)
 
