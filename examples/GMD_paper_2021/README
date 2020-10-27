@@ -6,9 +6,50 @@ DEPENDENCIES:
 - It is assumed that you successfully installed the snowScatt (at least version 1.0) package
 - Python packages: numpy, scipy, pandas, xarray, netcdf4, 
 - pytmatrix available on pip and https://github.com/jleinonen/pytmatrix
+- aggregation available https://github.com/jleinonen/aggregation
 - scattnlay https://github.com/ovidiopr/scattnlay
+
+ONE COMMAND EXECUTION
+Assuming you have succesfully installed the dependecy packages the following script downloads and unpacks the required material in the data/ folder and runs every python script
+download_data_run_all_scripts.sh
 
 DATASETS:
 The scripts expect to find the required data files under the data/ folder
 - Download the dedicated auxiliary data package from Zenodo https://doi.org/10.5281/zenodo.4118243 and unpack the compressed archive in the data/ folder
+- Fig.5 the Liu 2008 scatdb dataset in csv format https://github.com/rhoneyager/scatdb/raw/master/share/scatdb.csv. Since this file is not indexed under a repository a copy has been included in the data package, all rights remain to Dr. Ryan Honeyager and the original authors of scatdb.
 - Fig.9 Download the LV2 data from 24.11.2015 Tripex campaign and place the netCDF file in the data/ folder https://zenodo.org/record/1341390/files/tripex_joy_tricr00_l2_any_v00_20151124000000.nc
+
+This is how the data/ folder tree should look like after downloading and extractig all the auxiliary data
+
+data/
+├── P3
+│   ├── fwdP3.nc
+│   └── tripex_joy_tricr00_l2_any_v00_20151124000000.nc
+├── scattering_data_temp.nc
+├── shapefiles
+│   ├── dori
+│   │   ├── 1_8098.21.dat
+│   │   ├── 2_13885.6.dat
+│   │   └── 3_11938.9.dat
+│   ├── leinSubs
+│   │   ├── 1dendrite-650e-6-500-0.0-simultaneous-RHdsYfz3.agg
+│   │   ├── 2dendrite-650e-6-500-0.5-subsequent-Fw0euFGJ.agg
+│   │   └── 3dendrite-650e-6-500-1.0-subsequent-ZLha3PEc.agg
+│   └── lterzi
+│       ├── 1dendrite_6.482498E+02_Nmono_100.txt
+│       ├── 2needle_6.482498E+02_Nmono_100.txt
+│       ├── 3plate_6.482498E+02_Nmono_100.txt
+│       ├── 4mixcolumndend_8.685365E+01_nmono_100.0_shapefile.txt
+│       ├── 5mixcolumndend_4.552419E+02_nmono_100.0_shapefile.txt
+│       └── 6mixcolumndend_1.873444E+03_Nmono_100.txt
+└── tables
+    ├── dataJL_A0.0.csv
+    ├── dataJL_B0.5.csv
+    ├── dataJL_B1.0.csv
+    ├── scatdb.csv
+    ├── z_tm_graupel_Ka.csv
+    ├── z_tm_graupel_W.csv
+    ├── z_tm_graupel_X.csv
+    ├── z_tm_partrimed_Ka.csv
+    ├── z_tm_partrimed_W.csv
+    └── z_tm_partrimed_X.csv
