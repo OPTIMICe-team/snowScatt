@@ -15,7 +15,7 @@ download_data_run_all_scripts.sh
 
 DATASETS:
 The scripts expect to find the required data files under the data/ folder
-- Download the dedicated auxiliary data package from Zenodo https://doi.org/10.5281/zenodo.4118243 and unpack the compressed archive in the data/ folder
+- Download the dedicated auxiliary data package from Zenodo https://zenodo.org/record/4118243 and unpack the compressed archive in the data/ folder
 - Fig.5 the Liu 2008 scatdb dataset in csv format https://github.com/rhoneyager/scatdb/raw/master/share/scatdb.csv. Since this file is not indexed under a repository a copy has been included in the data package, all rights remain to Dr. Ryan Honeyager and the original authors of scatdb.
 - Fig.9 Download the LV2 data from 24.11.2015 Tripex campaign and place the netCDF file in the data/ folder https://zenodo.org/record/1341390/files/tripex_joy_tricr00_l2_any_v00_20151124000000.nc
 

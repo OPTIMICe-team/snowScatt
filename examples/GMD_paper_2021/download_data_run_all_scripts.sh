@@ -1,9 +1,9 @@
 #! /bin/bash
 
-mkdir -p data
-# wget https://zenodo.org/record/1341390/files/tripex_joy_tricr00_l2_any_v00_20151124000
+wget https://zenodo.org/record/4118243/files/data_snowScatt.tgz
 tar -xzvf data_snowScatt.tgz
 
+mkdir -p data
 wget https://github.com/rhoneyager/scatdb/raw/master/share/scatdb.csv
 mkdir -p data/tables
 mv scatdb.csv data/tables
