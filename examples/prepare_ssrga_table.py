@@ -4,6 +4,29 @@
 Created on Thu May 14 09:08:20 2020
 
 @author: dori
+
+This script show an example on how to use snowScatt to prepare a snow-table
+that snowScatt can use to compute the snowflake scattering and microphysical
+properties. To run this script you need a reasonable amount of snow shapes
+generated using either a physical or an heuristic model.
+One possible option is the aggregation and riming code from Jussi Leinonen
+https://github.com/jleinonen/aggregation
+
+The code needs to be adapted to the specific situation. The path where to find
+the shapefiles must be defined. Weather the shapefiles are saved using full
+floating point notation or a regular grid also makes a difference.
+The relevant information on how to make these adjustments is left as inline
+comments in the script.
+
+The script is divided into two parts that can potentially be run independently.
+First all the relavant properties of the single particles are derived and saved
+in a temporary hdf5 file.
+Second these properties are collected and grouped according to a user specified
+binning scheme. For each bin the statistical SSRGA parameters and microphysical
+properties are derived.
+The power-law fits to mass-size and area-size relations are derived from the
+whole population of shapefiles.
+
 """
 
 import logging

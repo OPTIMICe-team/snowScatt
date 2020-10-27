@@ -4,6 +4,14 @@
 Created on Mon May 25 09:37:31 2020
 
 @author: dori
+
+This script uses snowScatt to define the scattering properties of a series of
+particle types including Leinonen model B with varius riming degree and the
+Ori et al 2014 aggregates of columns. It then integrates the backscattering
+over inverse exponential PSDs with varius mean sizes and plots the
+triple-frequency plot DWR(X-Ka) vs DWR(Ka-W)
+
+It is mainly of interest for those who want to calculate radar reflectivity
 """
 
 import numpy as np
@@ -52,18 +60,6 @@ for r in rime:
     Zw = np.array([dB((1.0e18*bck.iloc[:, 2]*Nexp(Dmax, l)*np.gradient(Dmax)).sum()) for l in lams ])
     
     ax0.plot(Zk-Zw, Zx-Zk, label='L-B'+r)
-
-    # check consistency of methods OK
-    #wl = snowScatt._compute._c/frequency[0]
-    #Zx0 = Ze(Dmax, PSD, wl, particle, temperature=temperature)
-    #wl = snowScatt._compute._c/frequency[1]
-    #Zk0 = Ze(Dmax, PSD, wl, particle, temperature=temperature)
-    #wl = snowScatt._compute._c/frequency[2]
-    #Zw0 = Ze(Dmax, PSD, wl, particle, temperature=temperature)
-    
-    #ax1.plot(Zk0-Zw0, Zx0-Zk0, label=r)
-    
-    #print('diffs ', (Zx-Zx0).sum(), (Zk-Zk0).sum(), (Zw-Zw0).sum())
 
 particle = 'Ori_collColumns'
 bck = pd.DataFrame(index=Dmax, columns=frequency)

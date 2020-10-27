@@ -1,9 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Wed May 27 17:29:06 2020
+Created on Mon May 25 09:37:31 2020
 
 @author: dori
+
+This script uses snowScatt to define the scattering properties of a series of
+particle types including Leinonen model A with varius riming degree 
+It also uses snowScatt to calculate the particle fallspeed and uses the
+backscattering and fallspeed coherent information to estimate the Doppler
+spectrum
+
+It is mainly of interest for those who want to calculate radar Doppler spectrum
 """
 
 import numpy as np

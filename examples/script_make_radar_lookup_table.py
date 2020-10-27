@@ -1,3 +1,20 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Mon May 25 09:37:31 2020
+
+@author: dori
+
+This script uses snowScatt to define the scattering properties of one particle
+type (Leinonen rimed particle are preconfigured). It shows how to use snowScatt
+to compute coherent scattering and microphysical properties of those particles
+collects the results in a xarray dataset and save everything in a netCDF4
+lookup table (LUT)
+
+It is mainly of interest for those who want to know how to make use of the full
+features and capabilities of snowScatt
+"""
+
 import os
 import socket
 from datetime import datetime
@@ -12,7 +29,9 @@ Dmax = np.linspace(0.1e-3, 20.0e-3, 1000) # list of sizes
 sizes = xr.IndexVariable(dims='size', data=Dmax,
                          attrs={'long_name':'Size - Maximum dimension',
                                 'units':'meters'})
-particle = 'Leinonen15tabA20'
+particle = 'Leinonen15tabA00'
+filename = 'leinonen_A00_LUT.nc' # output filename
+
 frequency =  np.array([5.6e9, 9.6e9, 13.6e9, 35.6e9, 94.0e9]) # frequencies
 frequency = xr.IndexVariable(dims='frequency', data=frequency,
                              attrs={'units':'Hertz'})
@@ -23,7 +42,6 @@ angles = xr.IndexVariable(dims='scat_angle',
                           data=np.linspace(0, np.pi, Nangles),
                           attrs={'long_name':'scattering angle',
                                  'units':'radians'})
-filename = 'leinonen_A20_LUT.nc' # output filename
 
 ## Create empty xarray variables
 dims = ['size', 'frequency', 'temperature']
