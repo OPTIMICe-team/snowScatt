@@ -273,9 +273,7 @@ def backscatter(diameters, wavelength, properties, ref_index=None,
     """
 
     params = _prepare_input(diameters, wavelength, properties,
-                            ref_index, temperature, massScattering, theta,
-                            velocity_model, kwargsVelocity,
-                            massVelocity, areaVelocity)
+                            ref_index, temperature, massScattering, theta)
     Deff, Vol, wavelength, K, kappa, gamma, beta, zeta1, mass_prop, vel, area = params
     
     return ssrgaBack(Deff, Vol, wavelength, K, kappa, gamma, beta, zeta1)
