@@ -31,7 +31,7 @@ from Cython.Build import cythonize
 def configuration(parent_package='',top_path=None):
     from numpy.distutils.misc_util import Configuration
     config = Configuration('snowScatt', parent_package, top_path,
-        version = '0.1.2-alpha',
+        version = '1.0',
         author  = "Davide Ori",
         author_email = "davide.ori87@gmail.com",
         description = "SSRGA scattering computation and snow properties",
@@ -41,7 +41,7 @@ def configuration(parent_package='',top_path=None):
             'https://github.com/DaveOri/snowScatt.git',
         long_description = long_description,
         classifiers = [
-            "Development Status :: 3 - alpha",
+            "Development Status :: 5 - production/stable",
             "Intended Audience :: Science/Research",
             "License :: OSI Approved :: MIT License",
             "Operating System :: OS Independent",
