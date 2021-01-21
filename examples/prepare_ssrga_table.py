@@ -12,90 +12,45 @@ generated using either a physical or an heuristic model.
 One possible option is the aggregation and riming code from Jussi Leinonen
 https://github.com/jleinonen/aggregation
 
-The code needs to be adapted to the specific situation. The path where to find
-the shapefiles must be defined. Weather the shapefiles are saved using full
-floating point notation or a regular grid also makes a difference.
-The relevant information on how to make these adjustments is left as inline
-comments in the script.
-
 The script is divided into two parts that can potentially be run independently.
-First all the relavant properties of the single particles are derived and saved
-in a temporary hdf5 file.
-Second these properties are collected and grouped according to a user specified
-binning scheme. For each bin the statistical SSRGA parameters and microphysical
+This is the second part that reads an already generated file of area_functions
+and fits the SSRGA parameters. To generate the hdf5 area_functions file use the
+first script prepare_area_functions.py
+
+The microphysical properties recorded in the hdf5 file are collected and 
+grouped according to a user specified binning scheme.
+For each bin the statistical SSRGA parameters and microphysical
 properties are derived.
 The power-law fits to mass-size and area-size relations are derived from the
 whole population of shapefiles.
 
 """
-
-import logging
-logging.basicConfig(level=logging.INFO)
-
-import numpy as np
-from glob import glob
-#import gzip
-import pandas as pd
-from scipy.spatial import ConvexHull
-import snowScatt.ssrga as ssrga
-from snowScatt._constants import _ice_density
-from snowScatt.fallSpeed import Boehm1992 as B92
-from snowScatt.fallSpeed import KhvorostyanovCurry2005 as KC05
 from datetime import datetime as dt
+import pandas as pd
+import numpy as np
 
+import snowScatt.ssrga as ssrga
 
-path_to_shapefiles = '/home/dori/develop/pySAM/dat*/*.dat'#'../data/simultaneous-0.0/'
-shapefiles = glob(path_to_shapefiles)# + '*.agg')
-
-cols = ['Dmax', 'mass', 'area', 'area_function', 'resolution',
-        'vel_Bohm', 'vel_KC']
-data = pd.DataFrame(index=np.arange(len(shapefiles)), columns=cols) 
-
-deg = 'random'
+# path to the hdf5 file containing the shape properties
 deg = '00'
-for i, shapefile in enumerate(shapefiles):
-    shape = np.loadtxt(shapefile)[:,0:3]
-    d = 40.0e-6 # if I do not have metadata I am just assuming it is 40um
-    d = 20.0e-6
-    # d = 1.0 # if the shapefile is not on a regular grid d == 1
-    # Calculates Dmax myself
-    try:
-        hull3d=ConvexHull(shape)
-        hull3d=hull3d.points[hull3d.vertices]
-    except: # if it is too small it fails, but it is also useless
-        hull3d=shape
-    dmax = 0
-    for pi in range(0, hull3d.shape[0]-1):
-        p0 = hull3d[pi,:]
-        for pj in range(pi+1, hull3d.shape[0]):
-            p1 = hull3d[pj, :]
-            r = p0-p1
-            dist = np.dot(r, r)
-            if dist > dmax:
-                dmax = dist
-    dmax = d*dmax**0.5
-    
-    # Calculates projected area, along z axis
-    xy = (0, 1) # drop z coordinate
-    projection=pd.DataFrame(shape[:, xy]).drop_duplicates().values
-    #projection=pd.DataFrame(np.round(shape[:, xy]/d)).drop_duplicates().values*d # if you do not have a regular grid you need to regularize it first...
-    area = projection.shape[0]*d**2
-    mass = shape.shape[0]*d**3*_ice_density
-    vel_B92 = B92(dmax, mass, area) # perhaps aspect ratio?
-    vel_KC = KC05(dmax, mass, area)
-    # Calculate area function, along z axis
-    area_func = ssrga.area_function(shape*d, d, dmax, theta=np.pi*float(deg)/180.0) # multiply by resolution if you have a regular grid
-    #area_func = ssrga.area_function(shape, d, dmax, theta=np.pi*float(deg)/180.0) # if you have full precision floating point coordinates do this
-    #area_func = ssrga.area_function(shape*d, d, dmax, theta=np.pi*np.array([0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0])/180.0)
-    
-    # Put data in a DataFrame
-    data.loc[i] = [dmax, mass, area, area_func, d, vel_B92, vel_KC]
-data.to_hdf('area_functions_'+deg+'.h5', key='area') # save area_functions on a hdf5 file
+area_functions_file = 'area_functions_'+deg+'.h5'
+data = pd.read_hdf(area_functions_file)
 
 #%% Create bins for SSRGA
-minBin = 2.0e-3
-maxBin = 17.0e-3#23.0e-3
-resBin = 1.0e-3
+minBin = 2.0e-3 # Set minimum center size for bins
+maxBin = 15.0e-3#23.0e-3 # Set maximum center size for bins
+resBin = 1.0e-3 # Set regular bin resolution
+
+# NOTE: there is nothing that prevents you from having a not evenly spaced binning
+# snowScatt will work also with un regular tables
+
+table_name = 'table.csv'
+
+#################################################################################
+# DONE. I will take care of the rest
+#################################################################################
+
+# Deriving binning from bin parameters
 bin_edges = np.arange(minBin-resBin*0.5, maxBin+resBin, resBin)
 bin_center = np.arange(minBin, maxBin+resBin*0.5, resBin)
 bins = pd.cut(data['Dmax'], bin_edges)
@@ -143,7 +98,7 @@ aa = 10.0**(aa)
 
 # Apply reduction to the groups and write the table
 reducted = groups.apply(reduction)
-reducted.to_hdf('ssrga_'+deg+'.h5', key='area')
+# reducted.to_hdf('ssrga_'+deg+'.h5', key='area') # unnecessary, but snowScatt could move to binary tables
 reducted['Diam_max'] = reducted.index.mid
 reducted.set_index('Diam_max', inplace=True)
 reducted=reducted.astype(np.float64)
@@ -152,4 +107,4 @@ with open('table.csv', 'w') as csv:
     csv.write('# Example data file \n')
     csv.write('# created {} \n'.format(dt.now().strftime('%Y-%m-%d %H:%M:%S')))
     csv.write('# '+avgstr+'monomer_alpha={},\n'.format(0.3))
-reducted.to_csv('table.csv', mode='a', float_format='%7.6e')
+reducted.to_csv(table_name, mode='a', float_format='%7.6e')

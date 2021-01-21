@@ -171,6 +171,56 @@ LvTmixcoldend = {'path':module_path+'/ssrga_coeffs_mixcolumndend.csv',
            'msg':'Table of von Terzi assemblages of mixtures of columns and dendrites'}
 snowList['vonTerzi_mixcoldend'] = LvTmixcoldend
 
+# Leonie von Terzi Table for rimed assemblages of mixtures of columns and dendrites
+LvTmixcoldend_01 = {'path':module_path+'/ssrga_coeffs_mixcolumndend_rimed_0.1.csv',
+           'msg':'Table of von Terzi assemblages of mixtures of columns and dendrites with rimeelwp 0.1'}
+snowList['vonTerzi_mixcoldend_rimed01'] = LvTmixcoldend_01
+
+# Leonie von Terzi Table for rimed assemblages of mixtures of columns and dendrites
+LvTmixcoldend_02 = {'path':module_path+'/ssrga_coeffs_mixcolumndend_rimed_0.2.csv',
+           'msg':'Table of von Terzi assemblages of mixtures of columns and dendrites with rimeelwp 0.2'}
+snowList['vonTerzi_mixcoldend_rimed02'] = LvTmixcoldend_02
+
+# Leonie von Terzi Table for rimed assemblages of mixtures of columns and dendrites
+LvTmixcoldend_03 = {'path':module_path+'/ssrga_coeffs_mixcolumndend_rimed_0.3.csv',
+           'msg':'Table of von Terzi assemblages of mixtures of columns and dendrites with rimeelwp 0.3'}
+snowList['vonTerzi_mixcoldend_rimed03'] = LvTmixcoldend_03
+
+# Leonie von Terzi Table for rimed assemblages of mixtures of columns and dendrites
+LvTmixcoldend_04 = {'path':module_path+'/ssrga_coeffs_mixcolumndend_rimed_0.4.csv',
+           'msg':'Table of von Terzi assemblages of mixtures of columns and dendrites with rimeelwp 0.4'}
+snowList['vonTerzi_mixcoldend_rimed04'] = LvTmixcoldend_04
+
+# Leonie von Terzi Table for rimed assemblages of mixtures of columns and dendrites
+LvTmixcoldend_05 = {'path':module_path+'/ssrga_coeffs_mixcolumndend_rimed_0.5.csv',
+           'msg':'Table of von Terzi assemblages of mixtures of columns and dendrites with rimeelwp 0.5'}
+snowList['vonTerzi_mixcoldend_rimed05'] = LvTmixcoldend_05
+
+# Leonie von Terzi Table for rimed assemblages of mixtures of columns and dendrites
+LvTmixcoldend_06 = {'path':module_path+'/ssrga_coeffs_mixcolumndend_rimed_0.6.csv',
+           'msg':'Table of von Terzi assemblages of mixtures of columns and dendrites with rimeelwp 0.6'}
+snowList['vonTerzi_mixcoldend_rimed06'] = LvTmixcoldend_06
+
+# Leonie von Terzi Table for rimed assemblages of mixtures of columns and dendrites
+LvTmixcoldend_07 = {'path':module_path+'/ssrga_coeffs_mixcolumndend_rimed_0.7.csv',
+           'msg':'Table of von Terzi assemblages of mixtures of columns and dendrites with rimeelwp 0.7'}
+snowList['vonTerzi_mixcoldend_rimed07'] = LvTmixcoldend_07
+
+# Leonie von Terzi Table for rimed assemblages of mixtures of columns and dendrites
+LvTmixcoldend_08 = {'path':module_path+'/ssrga_coeffs_mixcolumndend_rimed_0.8.csv',
+           'msg':'Table of von Terzi assemblages of mixtures of columns and dendrites with rimeelwp 0.8'}
+snowList['vonTerzi_mixcoldend_rimed08'] = LvTmixcoldend_08
+
+# Leonie von Terzi Table for rimed assemblages of mixtures of columns and dendrites
+LvTmixcoldend_09 = {'path':module_path+'/ssrga_coeffs_mixcolumndend_rimed_0.9.csv',
+           'msg':'Table of von Terzi assemblages of mixtures of columns and dendrites with rimeelwp 0.9'}
+snowList['vonTerzi_mixcoldend_rimed09'] = LvTmixcoldend_09
+
+# Leonie von Terzi Table for rimed assemblages of mixtures of columns and dendrites
+LvTmixcoldend_10 = {'path':module_path+'/ssrga_coeffs_mixcolumndend_rimed_1.0.csv',
+           'msg':'Table of von Terzi assemblages of mixtures of columns and dendrites with rimeelwp 1.0'}
+snowList['vonTerzi_mixcoldend_rimed10'] = LvTmixcoldend_10
+
 # Davide Ori Table of unrimed aggregates obtained from a continuous collection of columnar crystals
 DOcollColumns = {'path':module_path+'/ssrga_coeffs_Ori_collection_columns.csv',
                  'msg':'Table of Davide Ori aggregates of collection of columns'}
