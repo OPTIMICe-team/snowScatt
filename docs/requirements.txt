@@ -1,3 +1,9 @@
 ipykernel
 nbsphinx
 Pillow>=7.1.0
+numpy
+scipy
+Cython
+pandas
+os
+xarray
