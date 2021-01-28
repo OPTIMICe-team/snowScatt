@@ -33,6 +33,7 @@ The core python package snowScatt provides an interface to a fast C code (ssrgal
 
 These submodules are installed as part of the main package, but can also be used as standalone libraries
 
+
 .. toctree::
    :numbered:
    :glob:
@@ -40,7 +41,9 @@ These submodules are installed as part of the main package, but can also be used
    :caption: Contents:
 
    install
+   tutorial
    simple_usage
+   notebooks/tutorial
    snowScatt
    troubleshooting
    credits
