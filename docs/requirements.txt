@@ -5,5 +5,4 @@ numpy
 scipy
 Cython
 pandas
-os
 xarray
