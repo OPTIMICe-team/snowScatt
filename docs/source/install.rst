@@ -50,7 +50,7 @@ Install sphinx, navigate the doc folder, compile the html documentation and open
 
 .. code-block:: bash
 
-	sudo apt install python3-sphinx
+	sudo apt install python3-sphinx python3-nbsphinx
 	cd docs
 	make html
 	firefox build/html/index.html &
