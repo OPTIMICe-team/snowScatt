@@ -41,9 +41,7 @@ These submodules are installed as part of the main package, but can also be used
    :caption: Contents:
 
    install
-   tutorial
    simple_usage
-   notebooks/tutorial
    snowScatt
    troubleshooting
    credits
