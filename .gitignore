@@ -4,6 +4,10 @@ examples/*.nc
 examples/*.png
 examples/*.h5
 examples/*.pdf
+docs/source/notebooks/*.png
+docs/source/notebooks/*.nc
+docs/source/notebooks/*.pdf
+docs/source/notebooks/*.csv
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

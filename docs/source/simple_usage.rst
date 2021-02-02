@@ -1,7 +1,9 @@
-Package Content
-===============
+Simple Usage Examples
+=====================
 
 Some simple use-case scenarios are illustrated in the `example folder <https://github.com/OPTIMICe-team/snowScatt/tree/master/examples>`_
+
+Here is a list of jupyter noteboks that will guide you thorugh the basic steps to effectively use snowScatt
 
 
 List snowScatt Library content

@@ -280,7 +280,12 @@ class snowLibraryClass():
 		area = np.minimum(a_disk, area)
 		mass = np.minimum(m_solid, mass)
 
-		vel = fallspeeds[velocity_model](diameters, mass, area, **kwargsVelocity) # TODO also need to pass kwargs additional and bring to the _compute module
+		if massVelocity is None:
+			massVelocity = mass
+		if areaVelocity is None:
+			areaVelocity = area
+
+		vel = fallspeeds[velocity_model](diameters, massVelocity, areaVelocity, **kwargsVelocity) # TODO also need to pass kwargs additional and bring to the _compute module
 
 		return np.asarray(kappa), np.asarray(beta), np.asarray(gamma), np.asarray(zeta1), np.asarray(alpha_eff), np.asarray(ar_mono), np.asarray(mass), np.asarray(vel), np.asarray(area)
 
