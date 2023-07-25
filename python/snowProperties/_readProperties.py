@@ -49,13 +49,15 @@ def _interpolate_coeff(D, table, ar_mono=1.0):
     ar_mono = np.ones_like(D)*ar_mono#interp(D, table.index.values, table.ar_mono)
     # TODO evaluate to shift these to another function
     mass = interp(D, table.index.values, table.mass, left=np.nan, right=np.nan)
-    vel = interp(D, table.index.values, table.vel_Bohm, left=np.nan, right=np.nan)
+    vel = interp(D, table.index.values, table.vel_Bohm, left=np.nan, right=np.nan)  # vel_Bohm needs to be there
     area = interp(D, table.index.values, table.area, left=np.nan, right=np.nan)
 
     return beta, gamma, kappa, zeta1, alpha_eff, ar_mono, mass, vel, area
 
-
+################################################################################################################
 ## Library of average parameters
+################################################################################################################
+
 snowLib = {}
 libKeys = ['kappa', 'beta', 'gamma', 'zeta1', 'aspect', 'ar_mono', 'am', 'bm', 'aa', 'ba', 'msg']
 
@@ -82,9 +84,16 @@ Oea14 = {'kappa': 0.190031, 'beta': 0.030681461,
          'msg':'Ori 2014 assemblages of columns'}
 snowLib['Oea14'] = Oea14
 
+################################################################################################################
 ## Library of tabulated files
+################################################################################################################
+
 snowList = {}
 fileKeys = ['path', 'msg']
+
+################################################################################################################
+# Leinonen rimed aggregates Leinonen Szyrmer 2015
+
 # Leinonen 2015 Table for unrimed snowflakes
 L15tabA00 = {'path':module_path+'/ssrga_coeffs_simultaneous_0.0.csv',
              'msg':'Table of Leinonen unrimed snowflakes'}
@@ -145,6 +154,9 @@ snowList['Leinonen15tabB20'] = L15tabB20
 L15tabC = {'path':module_path+'/ssrga_coeffs_rimec.csv',
            'msg':'Table of Leinonen rime only graupel'}
 snowList['Leinonen15tabC'] = L15tabC
+
+################################################################################################################
+# Uni Cologne "particle zoo" mainly Leonie von Terzi
 
 # Leonie von Terzi Table for unrimed assmblages of dendrites
 LvTdendrite = {'path':module_path+'/ssrga_coeffs_dendrite.csv',
@@ -221,10 +233,355 @@ LvTmixcoldend_10 = {'path':module_path+'/ssrga_coeffs_mixcolumndend_rimed_1.0.cs
            'msg':'Table of von Terzi assemblages of mixtures of columns and dendrites with rimeelwp 1.0'}
 snowList['vonTerzi_mixcoldend_rimed10'] = LvTmixcoldend_10
 
+################################################################################################################
 # Davide Ori Table of unrimed aggregates obtained from a continuous collection of columnar crystals
 DOcollColumns = {'path':module_path+'/ssrga_coeffs_Ori_collection_columns.csv',
                  'msg':'Table of Davide Ori aggregates of collection of columns'}
 snowList['Ori_collColumns'] = DOcollColumns
+
+################################################################################################################
+# Nina Maherndl - parametrizing SSRGA with respect to normalized rime fraction
+
+# Nina Maherndl rimed aggregates of column (M=0 unrimed) QJRMS 2023
+NMcolM00000 = {'path':module_path+'/ssrga_coeffs_column_M_0p00.csv',
+               'msg':'Table of Nina Maherndl aggregates of columns M=0'}
+snowList['Maherndl_columnsM00000'] = NMcolM00000
+
+# Nina Maherndl rimed aggregates of column (M=0.0129) QJRMS 2023
+NMcolM00129 = {'path':module_path+'/ssrga_coeffs_column_M_0p0129.csv',
+               'msg':'Table of Nina Maherndl aggregates of columns M=0.0129'}
+snowList['Maherndl_columnsM00129'] = NMcolM00129
+
+# Nina Maherndl rimed aggregates of column (M=0.0205) QJRMS 2023
+NMcolM00205 = {'path':module_path+'/ssrga_coeffs_column_M_0p0205.csv',
+               'msg':'Table of Nina Maherndl aggregates of columns M=0.0205'}
+snowList['Maherndl_columnsM00205'] = NMcolM00205
+
+# Nina Maherndl rimed aggregates of column (M=0.0324) QJRMS 2023
+NMcolM00324 = {'path':module_path+'/ssrga_coeffs_column_M_0p0324.csv',
+               'msg':'Table of Nina Maherndl aggregates of columns M=0.0324'}
+snowList['Maherndl_columnsM00324'] = NMcolM00324
+
+# Nina Maherndl rimed aggregates of column (M=0.0514) QJRMS 2023
+NMcolM00514 = {'path':module_path+'/ssrga_coeffs_column_M_0p0514.csv',
+               'msg':'Table of Nina Maherndl aggregates of columns M=0.0514'}
+snowList['Maherndl_columnsM00514'] = NMcolM00514
+
+# Nina Maherndl rimed aggregates of column (M=0.0816) QJRMS 2023
+NMcolM00816 = {'path':module_path+'/ssrga_coeffs_column_M_0p0816.csv',
+               'msg':'Table of Nina Maherndl aggregates of columns M=0.0816'}
+snowList['Maherndl_columnsM00816'] = NMcolM00816
+
+# Nina Maherndl rimed aggregates of column (M=0.1290) QJRMS 2023
+NMcolM01290 = {'path':module_path+'/ssrga_coeffs_column_M_0p1290.csv',
+               'msg':'Table of Nina Maherndl aggregates of columns M=0.1290'}
+snowList['Maherndl_columnsM01290'] = NMcolM01290
+
+# Nina Maherndl rimed aggregates of column (M=0.2045) QJRMS 2023
+NMcolM02045 = {'path':module_path+'/ssrga_coeffs_column_M_0p2045.csv',
+               'msg':'Table of Nina Maherndl aggregates of columns M=0.2045'}
+snowList['Maherndl_columnsM02045'] = NMcolM02045
+
+# Nina Maherndl rimed aggregates of column (M=0.3245) QJRMS 2023
+NMcolM03245 = {'path':module_path+'/ssrga_coeffs_column_M_0p3245.csv',
+               'msg':'Table of Nina Maherndl aggregates of columns M=0.3245'}
+snowList['Maherndl_columnsM03245'] = NMcolM03245
+
+# Nina Maherndl rimed aggregates of column (M=0.5145) QJRMS 2023
+NMcolM05145 = {'path':module_path+'/ssrga_coeffs_column_M_0p5145.csv',
+               'msg':'Table of Nina Maherndl aggregates of columns M=0.5145'}
+snowList['Maherndl_columnsM05145'] = NMcolM05145
+
+# Nina Maherndl rimed aggregates of column (M=0.8155) QJRMS 2023
+NMcolM08155 = {'path':module_path+'/ssrga_coeffs_column_M_0p8155.csv',
+               'msg':'Table of Nina Maherndl aggregates of columns M=0.8155'}
+snowList['Maherndl_columnsM08155'] = NMcolM08155
+
+#############################################################################
+
+# Nina Maherndl rimed aggregates of needles (M=0 unrimed) QJRMS 2023
+NMnedM00000 = {'path':module_path+'/ssrga_coeffs_needle_M_0p00.csv',
+               'msg':'Table of Nina Maherndl aggregates of needles M=0.0000'}
+snowList['Maherndl_needlesM00000'] = NMnedM00000
+
+# Nina Maherndl rimed aggregates of needles (M=0.0129) QJRMS 2023
+NMnedM00129 = {'path':module_path+'/ssrga_coeffs_needle_M_0p0129.csv',
+               'msg':'Table of Nina Maherndl aggregates of needles M=0.0129'}
+snowList['Maherndl_needlesM00129'] = NMnedM00129
+
+# Nina Maherndl rimed aggregates of needles (M=0.0205) QJRMS 2023
+NMnedM00205 = {'path':module_path+'/ssrga_coeffs_needle_M_0p0205.csv',
+               'msg':'Table of Nina Maherndl aggregates of needles M=0.0205'}
+snowList['Maherndl_needlesM00205'] = NMnedM00205
+
+# Nina Maherndl rimed aggregates of needles (M=0.0324) QJRMS 2023
+NMnedM00324 = {'path':module_path+'/ssrga_coeffs_needle_M_0p0324.csv',
+               'msg':'Table of Nina Maherndl aggregates of needles M=0.0324'}
+snowList['Maherndl_needlesM00324'] = NMnedM00324
+
+# Nina Maherndl rimed aggregates of needles (M=0.0514) QJRMS 2023
+NMnedM00514 = {'path':module_path+'/ssrga_coeffs_needle_M_0p0514.csv',
+               'msg':'Table of Nina Maherndl aggregates of needles M=0.0514'}
+snowList['Maherndl_needlesM00514'] = NMnedM00514
+
+# Nina Maherndl rimed aggregates of needles (M=0.0816) QJRMS 2023
+NMnedM00816 = {'path':module_path+'/ssrga_coeffs_needle_M_0p0816.csv',
+               'msg':'Table of Nina Maherndl aggregates of needles M=0.0816'}
+snowList['Maherndl_needlesM00816'] = NMnedM00816
+
+# Nina Maherndl rimed aggregates of needles (M=0.1290) QJRMS 2023
+NMnedM01290 = {'path':module_path+'/ssrga_coeffs_needle_M_0p1290.csv',
+               'msg':'Table of Nina Maherndl aggregates of needles M=0.1290'}
+snowList['Maherndl_needlesM01290'] = NMnedM01290
+
+# Nina Maherndl rimed aggregates of needles (M=0.2045) QJRMS 2023
+NMnedM02045 = {'path':module_path+'/ssrga_coeffs_needle_M_0p2045.csv',
+               'msg':'Table of Nina Maherndl aggregates of needles M=0.2045'}
+snowList['Maherndl_needlesM02045'] = NMnedM02045
+
+# Nina Maherndl rimed aggregates of needles (M=0.3245) QJRMS 2023
+NMnedM03245 = {'path':module_path+'/ssrga_coeffs_needle_M_0p3245.csv',
+               'msg':'Table of Nina Maherndl aggregates of needles M=0.3245'}
+snowList['Maherndl_needlesM03245'] = NMnedM03245
+
+# Nina Maherndl rimed aggregates of needles (M=0.5145) QJRMS 2023
+NMnedM05145 = {'path':module_path+'/ssrga_coeffs_needle_M_0p5145.csv',
+               'msg':'Table of Nina Maherndl aggregates of needles M=0.5145'}
+snowList['Maherndl_needlesM05145'] = NMnedM05145
+
+# Nina Maherndl rimed aggregates of needles (M=0.8155) QJRMS 2023
+NMnedM08155 = {'path':module_path+'/ssrga_coeffs_needle_M_0p8155.csv',
+               'msg':'Table of Nina Maherndl aggregates of needles M=0.8155'}
+snowList['Maherndl_needlesM08155'] = NMnedM08155
+
+#############################################################################
+
+# Nina Maherndl rimed aggregates of dendrites (M=0 unrimed) QJRMS 2023
+NMdenM00000 = {'path':module_path+'/ssrga_coeffs_dendrite_M_0p00.csv',
+               'msg':'Table of Nina Maherndl aggregates of dendrites M=0.0000'}
+snowList['Maherndl_dendritesM00000'] = NMdenM00000
+
+# Nina Maherndl rimed aggregates of dendrites (M=0.0129) QJRMS 2023
+NMdenM00129 = {'path':module_path+'/ssrga_coeffs_dendrite_M_0p0129.csv',
+               'msg':'Table of Nina Maherndl aggregates of dendrites M=0.0129'}
+snowList['Maherndl_dendritesM00129'] = NMdenM00129
+
+# Nina Maherndl rimed aggregates of dendrites (M=0.0205) QJRMS 2023
+NMdenM00205 = {'path':module_path+'/ssrga_coeffs_dendrite_M_0p0205.csv',
+               'msg':'Table of Nina Maherndl aggregates of dendrites M=0.0205'}
+snowList['Maherndl_dendritesM00205'] = NMdenM00205
+
+# Nina Maherndl rimed aggregates of dendrites (M=0.0324) QJRMS 2023
+NMdenM00324 = {'path':module_path+'/ssrga_coeffs_dendrite_M_0p0324.csv',
+               'msg':'Table of Nina Maherndl aggregates of dendrites M=0.0324'}
+snowList['Maherndl_dendritesM00324'] = NMdenM00324
+
+# Nina Maherndl rimed aggregates of dendrites (M=0.0514) QJRMS 2023
+NMdenM00514 = {'path':module_path+'/ssrga_coeffs_dendrite_M_0p0514.csv',
+               'msg':'Table of Nina Maherndl aggregates of dendrites M=0.0514'}
+snowList['Maherndl_dendritesM00514'] = NMdenM00514
+
+# Nina Maherndl rimed aggregates of dendrites (M=0.0816) QJRMS 2023
+NMdenM00816 = {'path':module_path+'/ssrga_coeffs_dendrite_M_0p0816.csv',
+               'msg':'Table of Nina Maherndl aggregates of dendrites M=0.0816'}
+snowList['Maherndl_dendritesM00816'] = NMdenM00816
+
+# Nina Maherndl rimed aggregates of dendrites (M=0.1290) QJRMS 2023
+NMdenM01290 = {'path':module_path+'/ssrga_coeffs_dendrite_M_0p1290.csv',
+               'msg':'Table of Nina Maherndl aggregates of dendrites M=0.1290'}
+snowList['Maherndl_dendritesM01290'] = NMdenM01290
+
+# Nina Maherndl rimed aggregates of dendrites (M=0.2045) QJRMS 2023
+NMdenM02045 = {'path':module_path+'/ssrga_coeffs_dendrite_M_0p2045.csv',
+               'msg':'Table of Nina Maherndl aggregates of dendrites M=0.2045'}
+snowList['Maherndl_dendritesM02045'] = NMdenM02045
+
+# Nina Maherndl rimed aggregates of dendrites (M=0.3245) QJRMS 2023
+NMdenM03245 = {'path':module_path+'/ssrga_coeffs_dendrite_M_0p3245.csv',
+               'msg':'Table of Nina Maherndl aggregates of dendrites M=0.3245'}
+snowList['Maherndl_dendritesM03245'] = NMdenM03245
+
+# Nina Maherndl rimed aggregates of dendrites (M=0.5145) QJRMS 2023
+NMdenM05145 = {'path':module_path+'/ssrga_coeffs_dendrite_M_0p5145.csv',
+               'msg':'Table of Nina Maherndl aggregates of dendrites M=0.5145'}
+snowList['Maherndl_dendritesM05145'] = NMdenM05145
+
+# Nina Maherndl rimed aggregates of dendrites (M=0.8155) QJRMS 2023
+NMdenM08155 = {'path':module_path+'/ssrga_coeffs_dendrite_M_0p8155.csv',
+               'msg':'Table of Nina Maherndl aggregates of dendrites M=0.8155'}
+snowList['Maherndl_dendritesM08155'] = NMdenM08155
+
+#############################################################################
+
+
+# Nina Maherndl rimed aggregates of plates (M=0 unrimed) QJRMS 2023
+NMplaM00000 = {'path':module_path+'/ssrga_coeffs_plate_M_0p00.csv',
+               'msg':'Table of Nina Maherndl aggregates of plates M=0.0000'}
+snowList['Maherndl_platesM00000'] = NMplaM00000
+
+# Nina Maherndl rimed aggregates of plates (M=0.0129) QJRMS 2023
+NMplaM00129 = {'path':module_path+'/ssrga_coeffs_plate_M_0p0129.csv',
+               'msg':'Table of Nina Maherndl aggregates of plates M=0.0129'}
+snowList['Maherndl_platesM00129'] = NMplaM00129
+
+# Nina Maherndl rimed aggregates of plates (M=0.0205) QJRMS 2023
+NMplaM00205 = {'path':module_path+'/ssrga_coeffs_plate_M_0p0205.csv',
+               'msg':'Table of Nina Maherndl aggregates of plates M=0.0205'}
+snowList['Maherndl_platesM00205'] = NMplaM00205
+
+# Nina Maherndl rimed aggregates of plates (M=0.0324) QJRMS 2023
+NMplaM00324 = {'path':module_path+'/ssrga_coeffs_plate_M_0p0324.csv',
+               'msg':'Table of Nina Maherndl aggregates of plates M=0.0324'}
+snowList['Maherndl_platesM00324'] = NMplaM00324
+
+# Nina Maherndl rimed aggregates of plates (M=0.0514) QJRMS 2023
+NMplaM00514 = {'path':module_path+'/ssrga_coeffs_plate_M_0p0514.csv',
+               'msg':'Table of Nina Maherndl aggregates of plates M=0.0514'}
+snowList['Maherndl_platesM00514'] = NMplaM00514
+
+# Nina Maherndl rimed aggregates of plates (M=0.0816) QJRMS 2023
+NMplaM00816 = {'path':module_path+'/ssrga_coeffs_plate_M_0p0816.csv',
+               'msg':'Table of Nina Maherndl aggregates of plates M=0.0816'}
+snowList['Maherndl_platesM00816'] = NMplaM00816
+
+# Nina Maherndl rimed aggregates of plates (M=0.1290) QJRMS 2023
+NMplaM01290 = {'path':module_path+'/ssrga_coeffs_plate_M_0p1290.csv',
+               'msg':'Table of Nina Maherndl aggregates of plates M=0.1290'}
+snowList['Maherndl_platesM01290'] = NMplaM01290
+
+# Nina Maherndl rimed aggregates of plates (M=0.2045) QJRMS 2023
+NMplaM02045 = {'path':module_path+'/ssrga_coeffs_plate_M_0p2045.csv',
+               'msg':'Table of Nina Maherndl aggregates of plates M=0.2045'}
+snowList['Maherndl_platesM02045'] = NMplaM02045
+
+# Nina Maherndl rimed aggregates of plates (M=0.3245) QJRMS 2023
+NMplaM03245 = {'path':module_path+'/ssrga_coeffs_plate_M_0p3245.csv',
+               'msg':'Table of Nina Maherndl aggregates of plates M=0.3245'}
+snowList['Maherndl_platesM03245'] = NMplaM03245
+
+# Nina Maherndl rimed aggregates of plates (M=0.5145) QJRMS 2023
+NMplaM05145 = {'path':module_path+'/ssrga_coeffs_plate_M_0p5145.csv',
+               'msg':'Table of Nina Maherndl aggregates of plates M=0.5145'}
+snowList['Maherndl_platesM05145'] = NMplaM05145
+
+# Nina Maherndl rimed aggregates of plates (M=0.8155) QJRMS 2023
+NMplaM08155 = {'path':module_path+'/ssrga_coeffs_plate_M_0p8155.csv',
+               'msg':'Table of Nina Maherndl aggregates of plates M=0.8155'}
+snowList['Maherndl_platesM08155'] = NMplaM08155
+
+#############################################################################
+
+# Nina Maherndl rimed aggregates of mixed monomers (M=0 unrimed) QJRMS 2023
+NMmixM00000 = {'path':module_path+'/ssrga_coeffs_mixed_M_0p00.csv',
+               'msg':'Table of Nina Maherndl aggregates of mixtures M=0.0000'}
+snowList['Maherndl_mixturesM00000'] = NMmixM00000
+
+# Nina Maherndl rimed aggregates of mixed monomers (M=0.0129) QJRMS 2023
+NMmixM00129 = {'path':module_path+'/ssrga_coeffs_mixed_M_0p0129.csv',
+               'msg':'Table of Nina Maherndl aggregates of mixtures M=0.00129'}
+snowList['Maherndl_mixturesM00129'] = NMmixM00129
+
+# Nina Maherndl rimed aggregates of mixed monomers (M=0.0205) QJRMS 2023
+NMmixM00205 = {'path':module_path+'/ssrga_coeffs_mixed_M_0p0205.csv',
+               'msg':'Table of Nina Maherndl aggregates of mixtures M=0.0205'}
+snowList['Maherndl_mixturesM00205'] = NMmixM00205
+
+# Nina Maherndl rimed aggregates of mixed monomers (M=0.0324) QJRMS 2023
+NMmixM00324 = {'path':module_path+'/ssrga_coeffs_mixed_M_0p0324.csv',
+               'msg':'Table of Nina Maherndl aggregates of mixtures M=0.0324'}
+snowList['Maherndl_mixturesM00324'] = NMmixM00324
+
+# Nina Maherndl rimed aggregates of mixed monomers (M=0.0514) QJRMS 2023
+NMmixM00514 = {'path':module_path+'/ssrga_coeffs_mixed_M_0p0514.csv',
+               'msg':'Table of Nina Maherndl aggregates of mixtures M=0.0514'}
+snowList['Maherndl_mixturesM00514'] = NMmixM00514
+
+# Nina Maherndl rimed aggregates of mixed monomers (M=0.0816) QJRMS 2023
+NMmixM00816 = {'path':module_path+'/ssrga_coeffs_mixed_M_0p0816.csv',
+               'msg':'Table of Nina Maherndl aggregates of mixtures M=0.0816'}
+snowList['Maherndl_mixturesM00816'] = NMmixM00816
+
+# Nina Maherndl rimed aggregates of mixed monomers (M=0.1290) QJRMS 2023
+NMmixM01290 = {'path':module_path+'/ssrga_coeffs_mixed_M_0p1290.csv',
+               'msg':'Table of Nina Maherndl aggregates of mixtures M=0.1290'}
+snowList['Maherndl_mixturesM01290'] = NMmixM01290
+
+# Nina Maherndl rimed aggregates of mixed monomers (M=0.2045) QJRMS 2023
+NMmixM02045 = {'path':module_path+'/ssrga_coeffs_mixed_M_0p2045.csv',
+               'msg':'Table of Nina Maherndl aggregates of mixtures M=0.2045'}
+snowList['Maherndl_mixturesM02045'] = NMmixM02045
+
+# Nina Maherndl rimed aggregates of mixed monomers (M=0.3245) QJRMS 2023
+NMmixM03245 = {'path':module_path+'/ssrga_coeffs_mixed_M_0p3245.csv',
+               'msg':'Table of Nina Maherndl aggregates of mixtures M=0.3245'}
+snowList['Maherndl_mixturesM03245'] = NMmixM03245
+
+# Nina Maherndl rimed aggregates of mixed monomers (M=0.5145) QJRMS 2023
+NMmixM05145 = {'path':module_path+'/ssrga_coeffs_mixed_M_0p5145.csv',
+               'msg':'Table of Nina Maherndl aggregates of mixtures M=0.5145'}
+snowList['Maherndl_mixturesM05145'] = NMmixM05145
+
+# Nina Maherndl rimed aggregates of mixed monomers (M=0.8155) QJRMS 2023
+NMmixM08155 = {'path':module_path+'/ssrga_coeffs_mixed_M_0p8155.csv',
+               'msg':'Table of Nina Maherndl aggregates of mixtures M=0.8155'}
+snowList['Maherndl_mixturesM08155'] = NMmixM08155
+
+#############################################################################
+
+# Nina Maherndl rimed aggregates of rosettes (M=0 unrimed) QJRMS 2023
+NMrosM00000 = {'path':module_path+'/ssrga_coeffs_rosette_M_0p00.csv',
+               'msg':'Table of Nina Maherndl aggregates of rosettes M=0.0000'}
+snowList['Maherndl_rosettesM00000'] = NMrosM00000
+
+# Nina Maherndl rimed aggregates of rosettes (M=0.0129) QJRMS 2023
+NMrosM00129 = {'path':module_path+'/ssrga_coeffs_rosette_M_0p0129.csv',
+               'msg':'Table of Nina Maherndl aggregates of rosettes M=0.0129'}
+snowList['Maherndl_rosettesM00129'] = NMrosM00129
+
+# Nina Maherndl rimed aggregates of rosettes (M=0.0205) QJRMS 2023
+NMrosM00205 = {'path':module_path+'/ssrga_coeffs_rosette_M_0p0205.csv',
+               'msg':'Table of Nina Maherndl aggregates of rosettes M=0.0205'}
+snowList['Maherndl_rosettesM00205'] = NMrosM00205
+
+# Nina Maherndl rimed aggregates of rosettes (M=0.0324) QJRMS 2023
+NMrosM00324 = {'path':module_path+'/ssrga_coeffs_rosette_M_0p0324.csv',
+               'msg':'Table of Nina Maherndl aggregates of rosettes M=0.0324'}
+snowList['Maherndl_rosettesM00324'] = NMrosM00324
+
+# Nina Maherndl rimed aggregates of rosettes (M=0.0514) QJRMS 2023
+NMrosM00514 = {'path':module_path+'/ssrga_coeffs_rosette_M_0p0514.csv',
+               'msg':'Table of Nina Maherndl aggregates of rosettes M=0.0514'}
+snowList['Maherndl_rosettesM00514'] = NMrosM00514
+
+# Nina Maherndl rimed aggregates of rosettes (M=0.0816) QJRMS 2023
+NMrosM00816 = {'path':module_path+'/ssrga_coeffs_rosette_M_0p0816.csv',
+               'msg':'Table of Nina Maherndl aggregates of rosettes M=0.0816'}
+snowList['Maherndl_rosettesM00816'] = NMrosM00816
+
+# Nina Maherndl rimed aggregates of rosettes (M=0.1290) QJRMS 2023
+NMrosM01290 = {'path':module_path+'/ssrga_coeffs_rosette_M_0p1290.csv',
+               'msg':'Table of Nina Maherndl aggregates of rosettes M=0.1290'}
+snowList['Maherndl_rosettesM01290'] = NMrosM01290
+
+# Nina Maherndl rimed aggregates of rosettes (M=0.2045) QJRMS 2023
+NMrosM02045 = {'path':module_path+'/ssrga_coeffs_rosette_M_0p2045.csv',
+               'msg':'Table of Nina Maherndl aggregates of rosettes M=0.2045'}
+snowList['Maherndl_rosettesM02045'] = NMrosM02045
+
+# Nina Maherndl rimed aggregates of rosettes (M=0.3245) QJRMS 2023
+NMrosM03245 = {'path':module_path+'/ssrga_coeffs_rosette_M_0p3245.csv',
+               'msg':'Table of Nina Maherndl aggregates of rosettes M=0.3245'}
+snowList['Maherndl_rosettesM03245'] = NMrosM03245
+
+# Nina Maherndl rimed aggregates of rosettes (M=0.5145) QJRMS 2023
+NMrosM05145 = {'path':module_path+'/ssrga_coeffs_rosette_M_0p5145.csv',
+               'msg':'Table of Nina Maherndl aggregates of rosettes M=0.5145'}
+snowList['Maherndl_rosettesM05145'] = NMrosM05145
+
+# Nina Maherndl rimed aggregates of rosettes (M=0.8155) QJRMS 2023
+NMrosM08155 = {'path':module_path+'/ssrga_coeffs_rosette_M_0p8155.csv',
+               'msg':'Table of Nina Maherndl aggregates of rosettes M=0.8155'}
+snowList['Maherndl_rosettesM08155'] = NMrosM08155
 
 
 class snowProperties():
