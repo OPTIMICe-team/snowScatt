@@ -27,7 +27,7 @@ Online Documentation
 :target: https://snowscatt.readthedocs.io/en/latest/?badge=latest
 :alt: Documentation Status
 
-The documentation and a usage guide are available at `https://snowScatt.readthedocs.io <https://snowScatt.readthedocs.io>`_.
+The documentation and a usage guide are available at `snowScatt-paper <https://snowScatt.readthedocs.io <https://snowScatt.readthedocs.io>`_.
 If for any reason readthedocs should broke a static copy of the documentation can be accessed `here <http://gop.meteo.uni-koeln.de/~dori/build/html/index.html>`_.
 
 -------------
