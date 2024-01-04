@@ -27,11 +27,12 @@ Online Documentation
 :target: https://snowscatt.readthedocs.io/en/latest/?badge=latest
 :alt: Documentation Status
 
-The documentation and a usage guide are available at `snowScatt-paper <https://snowScatt.readthedocs.io <https://snowScatt.readthedocs.io>`_.
+The documentation and a usage guide are available at `https://snowScatt.readthedocs.io <https://snowScatt.readthedocs.io>`_.
 If for any reason readthedocs should broke a static copy of the documentation can be accessed `here <http://gop.meteo.uni-koeln.de/~dori/build/html/index.html>`_.
 
 -------------
 Cite the code
 -------------
-If you use snowScatt please cite the related publication `https://gmd.copernicus.org/articles/14/1511/2021/`_
+If you use snowScatt please cite the related publication `<https://gmd.copernicus.org/articles/14/1511/2021/>`_
+
 The package version at the time of the publication is indexed on Zenodo DOI `10.5281/zenodo.3746261 <https://doi.org/10.5281/zenodo.3746261>`_
