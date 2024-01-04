@@ -10,16 +10,15 @@ snowScatt
 Quick Guide
 -----------
 
-Clone or download the repository. Navigate the main folder and install the package with
+Clone or download the repository. Install the listed requirements (numpy and Cython for the installation, the rest [scipy, matplotlib, xarray, pandas] for the runtime, including some example scripts). Navigate the main folder and install the package with
 .. code-block::
-  python3 setup.py install --user
+  python -m pip .
 
 The scripts in the example folder should give enough information on how to use the software main functionalities.
 After installation you should be able to execute in a python environment
 .. code-block::
   import snowScatt
   snowScatt.help()
-
 
 --------------------
 Online Documentation
@@ -34,5 +33,5 @@ If for any reason readthedocs should broke a static copy of the documentation ca
 -------------
 Cite the code
 -------------
-This package is indexed on Zenodo DOI `10.5281/zenodo.3746261 <https://doi.org/10.5281/zenodo.3746261>`_
-A scientific publication is under preparation
+If you use snowScatt please cite the related publication `https://gmd.copernicus.org/articles/14/1511/2021/`_
+The package version at the time of the publication is indexed on Zenodo DOI `10.5281/zenodo.3746261 <https://doi.org/10.5281/zenodo.3746261>`_
