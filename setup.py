@@ -18,76 +18,20 @@ University of Cologne
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
+import numpy
+from setuptools import Extension, setup
+#from Cython.Build import cythonize 
 
-long_description = """A Python code for computing the scattering properties
-of complex shaped snowflakes using the Self-Similar Rayleigh-Gans Approximation.
-
-Requires NumPy and SciPy.
-"""
-
-import sys
-from Cython.Build import cythonize
-
-def configuration(parent_package='',top_path=None):
-    from numpy.distutils.misc_util import Configuration
-    config = Configuration('snowScatt', parent_package, top_path,
-        version = '1.0',
-        author  = "Davide Ori",
-        author_email = "davide.ori87@gmail.com",
-        description = "SSRGA scattering computation and snow properties",
-        license = "GPL",
-        url = 'https://github.com/DaveOri/snowScatt.git',
-        download_url = \
-            'https://github.com/DaveOri/snowScatt.git',
-        long_description = long_description,
-        classifiers = [
-            "Development Status :: 5 - production/stable",
-            "Intended Audience :: Science/Research",
-            "License :: OSI Approved :: MIT License",
-            "Operating System :: OS Independent",
-            "Programming Language :: C",
-            "Programming Language :: Python",
-            "Topic :: Scientific/Engineering :: Physics",
-        ]
-    )
-
-    return config
-
-
-from distutils.extension import Extension
-# Create extension objects to be passed to the setup() function
-ssrgalib = Extension(name="snowScatt.ssrgalib",  # indicate where it should be available this will be the name of the module to be imported
-                     sources=["cython/ssrga_module.pyx",
-                              "src/ssrga.c",
-                              "src/dielectric_factor.c"
-                             ],
-                     extra_compile_args=["-O2", "-ffast-math", "-Wall", "-fPIC",
-                                         "-fPIC", "-std=c99", "-lm", "-lmvec",
-                                         "-ldl", "-lc",
-                                        ],
-                     language="c")
-
-
-if __name__ == "__main__":
-
-    from numpy.distutils.core import setup
-    setup(configuration=configuration,
-        packages = ['snowScatt',
-                    'snowScatt.snowProperties',
-                    'snowScatt.refractiveIndex',
-                    'snowScatt.instrumentSimulator',
-                    'snowScatt.ssrga',
-                    'snowScatt.fallSpeed'
-                    ],
-        package_dir={'snowScatt': 'python' ,
-                     'snowScatt.snowProperties': 'python/snowProperties',
-                     'snowScatt.refractiveIndex': 'python/refractiveIndex',
-                     'snowScatt.instrumentSimulator': 'python/instrumentSimulator',
-                     'snowScatt.ssrga': 'python/ssrga',
-                     'snowScatt.fallSpeed': 'python/fallSpeed'
-                     },
-        package_data = {'snowScatt.snowProperties': ['*.csv'],
-                        'snowScatt.refractiveIndex': ['*.dat'],},
-        platforms = ['any'],
-        #requires = ['numpy', 'scipy', 'Cython', 'pandas', 'os', 'xarray'],
-        ext_modules=cythonize([ssrgalib]))
+setup(name="snowScatt", # name of the package should be handled by .toml
+      ext_modules=[Extension(name="snowScatt.ssrgalib",
+                             sources=["cython/ssrga_module.pyx",
+                                      "src/ssrga.c",
+                                      "src/dielectric_factor.c"],
+                             extra_compile_args=["-O2", "-ffast-math", "-Wall", "-fPIC",
+                                                 "-fPIC", "-std=c99", "-lm", "-lmvec",
+                                                 "-ldl", "-lc"],
+                             language="c",
+                             include_dirs=[numpy.get_include()]
+                             )
+                  ],
+      )

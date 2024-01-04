@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools",
+            "setuptools-scm",
+            "cython",
+            "numpy"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "snowScatt"
+version = "1.0.1"
+dependencies = ["numpy", "scipy", "pandas", "xarray", "Cython"]
+requires-python = ">=3.7" # TODO check this, probably lower requirements for new installation mode
+authors = [{name="Davide Ori", email="davide.ori87@gmail.com"},
+           {name="Leonie von Terzi"},
+           {name="various contributors"}]
+maintainers = [{name="Davide Ori", email="davide.ori87@gmail.com"},]
+description = "Computes scattering properties of complex shaped snowflakes using SSRGA"
+readme = "README.rst"
+keywords = ["scattering", "microwave", "radar", "radiometer", "snowflake", "SSRGA", "self-similar", "multifrequency"]
+classifiers = ["Development Status :: 5 - production/stable",
+               "Intended Audience :: Science/Research",
+               "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+               "Operating System :: OS Independent",
+               "Programming Language :: C",
+               "Programming Language :: Python",
+               "Topic :: Scientific/Engineering :: Physics"]
+
+[project.urls]
+Homepage = "https://github.com/OPTIMICe-team/snowScatt/"
+Documentation = "https://snowscatt.readthedocs.io/"
+Repository = "https://github.com/OPTIMICe-team/snowScatt/"
+Issues = "https://github.com/OPTIMICe-team/snowScatt/issues"
+Changelog = "https://github.com/OPTIMICe-team/snowScatt/tree/master/CHANGELOG.md"
+
+[tool.setuptools]
+include-package-data = true
+packages = ["snowScatt",
+            "snowScatt.snowProperties",
+            "snowScatt.refractiveIndex",
+            "snowScatt.instrumentSimulator",
+            "snowScatt.ssrga",
+            "snowScatt.fallSpeed"]
+package-dir = {snowScatt="python", snowProperties="python/snowProperties", refractiveIndex="python/refractiveIndex", instrumentSimulator="python/instrumentSimulator", ssrga="python/ssrga", fallSpeed="python/fallSpeed"}
+
+#[tool.setuptools.package-data]
+#snowProperties = ["*.csv"]
+#refractiveIndex = ["*.dat"]
+
