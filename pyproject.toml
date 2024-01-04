@@ -30,7 +30,7 @@ Homepage = "https://github.com/OPTIMICe-team/snowScatt/"
 Documentation = "https://snowscatt.readthedocs.io/"
 Repository = "https://github.com/OPTIMICe-team/snowScatt/"
 Issues = "https://github.com/OPTIMICe-team/snowScatt/issues"
-Changelog = "https://github.com/OPTIMICe-team/snowScatt/tree/master/CHANGELOG.md"
+Changelog = "https://github.com/OPTIMICe-team/snowScatt/releases"
 
 [tool.setuptools]
 include-package-data = true
