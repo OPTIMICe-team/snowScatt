@@ -10,15 +10,13 @@ snowScatt
 Quick Guide
 -----------
 
-Clone or download the repository. Install the listed requirements (numpy and Cython for the installation, the rest [scipy, matplotlib, xarray, pandas] for the runtime, including some example scripts). Navigate the main folder and install the package with
-.. code-block::
-  python -m pip .
+| Clone or download the repository. Install the listed requirements (numpy and Cython for the installation, the rest [scipy, matplotlib, xarray, pandas] for the runtime, including some example scripts). Navigate the main folder and install the package with
+|  python -m pip .
 
-The scripts in the example folder should give enough information on how to use the software main functionalities.
-After installation you should be able to execute in a python environment
-.. code-block::
-  import snowScatt
-  snowScatt.help()
+| The scripts in the example folder should give enough information on how to use the software main functionalities.
+| After installation you should be able to execute in a python environment
+|  import snowScatt
+|  snowScatt.help()
 
 --------------------
 Online Documentation

@@ -15,7 +15,7 @@ authors = [{name="Davide Ori", email="davide.ori87@gmail.com"},
            {name="various contributors"}]
 maintainers = [{name="Davide Ori", email="davide.ori87@gmail.com"},]
 description = "Computes scattering properties of complex shaped snowflakes using SSRGA"
-readme = "README.rst"
+readme = "README.md" # only for PyPI
 keywords = ["scattering", "microwave", "radar", "radiometer", "snowflake", "SSRGA", "self-similar", "multifrequency"]
 classifiers = ["Development Status :: 5 - production/stable",
                "Intended Audience :: Science/Research",
@@ -41,8 +41,4 @@ packages = ["snowScatt",
             "snowScatt.ssrga",
             "snowScatt.fallSpeed"]
 package-dir = {snowScatt="python", snowProperties="python/snowProperties", refractiveIndex="python/refractiveIndex", instrumentSimulator="python/instrumentSimulator", ssrga="python/ssrga", fallSpeed="python/fallSpeed"}
-
-#[tool.setuptools.package-data]
-#snowProperties = ["*.csv"]
-#refractiveIndex = ["*.dat"]
 
