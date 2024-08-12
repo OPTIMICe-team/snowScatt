@@ -7,7 +7,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "snowScatt"
-version = "1.0.1"
+version = "1.1.0"
 dependencies = ["numpy", "scipy", "pandas", "xarray", "Cython"]
 requires-python = ">=3.7" # TODO check this, probably lower requirements for new installation mode
 authors = [{name="Davide Ori", email="davide.ori87@gmail.com"},

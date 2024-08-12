@@ -20,18 +20,21 @@ University of Cologne
 """
 import numpy
 from setuptools import Extension, setup
-#from Cython.Build import cythonize 
+from Cython.Build import cythonize 
+
+
+ssrgalib = Extension(name="snowScatt.ssrgalib",
+                     sources=["cython/ssrga_module.pyx",
+                              "src/ssrga.c",
+                              "src/dielectric_factor.c"],
+                     extra_compile_args=["-O2", "-ffast-math", "-Wall",
+                                         "-fPIC", "-std=c99", "-lm", "-lmvec"
+                                         "-ldl", "-lc"],
+                     language="c",
+                     include_dirs=[numpy.get_include()]
+
+)
 
 setup(name="snowScatt", # name of the package should be handled by .toml
-      ext_modules=[Extension(name="snowScatt.ssrgalib",
-                             sources=["cython/ssrga_module.pyx",
-                                      "src/ssrga.c",
-                                      "src/dielectric_factor.c"],
-                             extra_compile_args=["-O2", "-ffast-math", "-Wall", "-fPIC",
-                                                 "-fPIC", "-std=c99", "-lm", "-lmvec",
-                                                 "-ldl", "-lc"],
-                             language="c",
-                             include_dirs=[numpy.get_include()]
-                             )
-                  ],
+      ext_modules=cythonize([ssrgalib])
       )
