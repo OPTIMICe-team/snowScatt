@@ -24,7 +24,8 @@ import logging
 import pandas as pd
 import numpy as np
 from os import path
-from scipy import interp
+from numpy import interp
+
 from snowScatt.fallSpeed import Boehm1992
 from snowScatt.fallSpeed import Boehm1989
 from snowScatt.fallSpeed import HeymsfieldWestbrook2010

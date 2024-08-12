@@ -50,34 +50,29 @@ from os import path
 
 import numpy as np
 import pandas as pd
-from scipy import interpolate
+from scipy.interpolate import RectBivariateSpline, make_interp_spline
 
 module_path = path.split(path.abspath(__file__))[0]
-warren_ice_table = pd.read_csv(
-    module_path+'/IOP_2008_ASCIItable.dat',
-    delim_whitespace=True, names=['wl', 'mr', 'mi']
-    )
-warren_ice_table['f'] = 299792.458e9 / \
-    warren_ice_table.wl  # wl is microns, should return Hz
+warren_ice_table = pd.read_csv(module_path+'/IOP_2008_ASCIItable.dat',
+                               sep='\s+', names=['wl', 'mr', 'mi'])
+warren_ice_table['f'] = 299792.458e9/warren_ice_table.wl# wl[um] thus f[Hz]
 warren_ice_table = warren_ice_table.set_index('f')
 warren_ice_table = warren_ice_table.iloc[::-1]  # reverse order
 warren_ice_eps = (warren_ice_table.mr.values+1j*warren_ice_table.mi.values)**2
-warren_ice_interpolated = interpolate.interp1d(
-    warren_ice_table.index.values, warren_ice_eps, assume_sorted=True)
+warren_ice_interpolated = make_interp_spline(warren_ice_table.index.values,
+                                             warren_ice_eps, k=1)
 
-iwabuchi_ice_table = pd.read_csv(
-    module_path+'/iwabuchi_ice_eps.dat',
-    index_col=0, dtype=np.float64, comment='#'
-    )
+iwabuchi_ice_table = pd.read_csv(module_path+'/iwabuchi_ice_eps.dat',
+                                 index_col=0, dtype=np.float64, comment='#')
 iwabuchi_ice_table.index.name = 'f'
-iwabuchi_ice_interp_real = interpolate.interp2d(np.arange(
-    160., 275., 10.),
-iwabuchi_ice_table.index.values, iwabuchi_ice_table.values[:, 0:12]
-)
-iwabuchi_ice_interp_imag = interpolate.interp2d(np.arange(
-    160., 275., 10.),
-iwabuchi_ice_table.index.values, iwabuchi_ice_table.values[:, 12:]
-)
+iwabuchi_ice_interp_real = RectBivariateSpline(iwabuchi_ice_table.index.values,
+                                               np.arange(160., 275., 10.),
+                                               iwabuchi_ice_table.values[:, 0:12],
+                                               kx=1, ky=1)
+iwabuchi_ice_interp_imag = RectBivariateSpline(iwabuchi_ice_table.index.values,
+                                               np.arange(160., 275., 10.),
+                                               iwabuchi_ice_table.values[:, 12:],
+                                               kx=1, ky=1)
 
 
 def iwabuchi_yang_2011(temperature, frequency):
