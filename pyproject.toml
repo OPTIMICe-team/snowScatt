@@ -15,7 +15,7 @@ authors = [{name="Davide Ori", email="davide.ori87@gmail.com"},
            {name="various contributors"}]
 maintainers = [{name="Davide Ori", email="davide.ori87@gmail.com"},]
 description = "Computes scattering properties of complex shaped snowflakes using SSRGA"
-readme = "README.md" # only for PyPI
+readme = "pypiREADME.md" # only for PyPI
 keywords = ["scattering", "microwave", "radar", "radiometer", "snowflake", "SSRGA", "self-similar", "multifrequency"]
 classifiers = ["Development Status :: 5 - production/stable",
                "Intended Audience :: Science/Research",
